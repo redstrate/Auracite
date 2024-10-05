@@ -69,12 +69,12 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
                     let inner_html = block_name.inner_html();
                     let captures = re.captures(&inner_html).unwrap();
 
-                    char_data.race = captures.get(1).unwrap().as_str().to_owned();
-                    char_data.subrace = captures.get(2).unwrap().as_str().to_owned();
+                    char_data.appearance.race = captures.get(1).unwrap().as_str().to_owned();
+                    char_data.appearance.subrace = captures.get(2).unwrap().as_str().to_owned();
                     if captures.get(3).unwrap().as_str() == "♀" {
-                        char_data.gender = "Female".parse().unwrap();
+                        char_data.appearance.gender = "Female".parse().unwrap();
                     } else {
-                        char_data.gender = "Male".parse().unwrap();
+                        char_data.appearance.gender = "Male".parse().unwrap();
                     }
                 }
             } else if name == "City-state" {

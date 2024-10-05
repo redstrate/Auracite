@@ -18,9 +18,9 @@ pub fn write_html(char_data: &CharacterData, file_path: &str) -> io::Result<()> 
             name => char_data.name,
             world => char_data.world,
             data_center => char_data.data_center,
-            race => char_data.race,
-            subrace => char_data.subrace,
-            gender => char_data.gender,
+            race => char_data.appearance.race,
+            subrace => char_data.appearance.subrace,
+            gender => char_data.appearance.gender,
             nameday => char_data.nameday,
             city_state => char_data.city_state
         })

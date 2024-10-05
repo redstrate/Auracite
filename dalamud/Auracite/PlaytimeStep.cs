@@ -18,6 +18,10 @@ public class PlaytimeStep : IStep, IDisposable
 
     public event IStep.CompletedDelegate? Completed;
 
+    public void Run()
+    {
+    }
+
     public string StepName()
     {
         return "Playtime";

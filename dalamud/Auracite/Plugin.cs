@@ -16,7 +16,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(PlaytimeStep)];
+        [typeof(AppearanceStep), typeof(PlaytimeStep)];
 
     private int _stepIndex;
 
@@ -25,6 +25,8 @@ public sealed class Plugin : IDalamudPlugin
     public class Package
     {
         public string playtime;
+        public int height;
+        public int bust_size;
     }
 
     public static Package? package;
@@ -78,6 +80,7 @@ public sealed class Plugin : IDalamudPlugin
         }
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
+        CurrentStep.Run();
     }
 
     private void SendPackage()

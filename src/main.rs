@@ -30,6 +30,8 @@ struct Args {
 #[derive(Default, Deserialize, Clone)]
 struct Package {
     playtime: String,
+    height: i32,
+    bust_size: i32,
 }
 
 #[derive(Clone)]
@@ -44,7 +46,7 @@ impl Service for PackageService<'_> {
 
     fn call(&self, req: Request<Body>) -> Result<Response<Self::Body>, Self::Error> {
         *self.package.lock().unwrap() = serde_json::from_str(&String::from_utf8(req.into_body().into_bytes().unwrap()).unwrap()).unwrap();
-        
+
         *self.wants_stop.lock().unwrap() = true;
 
         Ok(Response::builder()
@@ -109,6 +111,8 @@ fn main() {
         let package = &*package.lock().unwrap();
 
         char_data.playtime = package.playtime.parse().unwrap();
+        char_data.appearance.height = package.height;
+        char_data.appearance.bust_size = package.bust_size;
     }
 
     let serialized = serde_json::to_string(&char_data).unwrap();
