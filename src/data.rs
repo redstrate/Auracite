@@ -2,7 +2,7 @@ use serde::Serialize;
 
 #[derive(Default, Serialize)]
 pub struct Currencies {
-    pub gil: i64,
+    pub gil: u32,
 }
 
 #[derive(Default, Serialize)]

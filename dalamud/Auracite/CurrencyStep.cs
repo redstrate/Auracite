@@ -1,8 +1,8 @@
-using Dalamud.Game.ClientState.Objects.Enums;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace Auracite;
 
-public class AppearanceStep : IStep
+public class CurrencyStep : IStep
 {
     public event IStep.CompletedDelegate? Completed;
 
@@ -10,15 +10,17 @@ public class AppearanceStep : IStep
     {
         if (Plugin.ClientState.LocalPlayer != null)
         {
-            Plugin.package.height = Plugin.ClientState.LocalPlayer.Customize[(int)CustomizeIndex.Height];
-            Plugin.package.bust_size = Plugin.ClientState.LocalPlayer.Customize[(int)CustomizeIndex.BustSize];
+            unsafe
+            {
+                Plugin.package.gil = InventoryManager.Instance()->GetGil();
+            }
         }
         Completed?.Invoke();
     }
 
     public string StepName()
     {
-        return "Appearance";
+        return "Currency";
     }
 
     public string StepDescription()

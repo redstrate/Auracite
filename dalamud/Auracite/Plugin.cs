@@ -16,7 +16,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(AppearanceStep), typeof(PlaytimeStep)];
+        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(PlaytimeStep)];
 
     private int _stepIndex;
 
@@ -27,6 +27,7 @@ public sealed class Plugin : IDalamudPlugin
         public string playtime;
         public int height;
         public int bust_size;
+        public uint gil;
     }
 
     public static Package? package;

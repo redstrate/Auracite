@@ -32,6 +32,7 @@ struct Package {
     playtime: String,
     height: i32,
     bust_size: i32,
+    gil: u32,
 }
 
 #[derive(Clone)]
@@ -113,6 +114,7 @@ fn main() {
         char_data.playtime = package.playtime.parse().unwrap();
         char_data.appearance.height = package.height;
         char_data.appearance.bust_size = package.bust_size;
+        char_data.currencies.gil = package.gil;
     }
 
     let serialized = serde_json::to_string(&char_data).unwrap();
