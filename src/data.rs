@@ -17,6 +17,7 @@ pub struct CharacterData {
     pub nameday: String,
     pub guardian: String,
     pub currencies: Currencies,
+    pub playtime: String,
 
     #[serde(skip)]
     pub face_url: String,
