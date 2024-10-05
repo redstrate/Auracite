@@ -16,7 +16,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(PlaytimeStep)];
+        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(MiscStep), typeof(PlaytimeStep)];
 
     private int _stepIndex;
 
@@ -28,6 +28,11 @@ public sealed class Plugin : IDalamudPlugin
         public int height;
         public int bust_size;
         public uint gil;
+        public bool is_battle_mentor;
+        public bool is_trade_mentor;
+        public bool is_novice;
+        public bool is_returner;
+        public short player_commendations;
     }
 
     public static Package? package;

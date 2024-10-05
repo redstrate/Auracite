@@ -33,6 +33,11 @@ struct Package {
     height: i32,
     bust_size: i32,
     gil: u32,
+    is_battle_mentor: bool,
+    is_trade_mentor: bool,
+    is_novice: bool,
+    is_returner: bool,
+    player_commendations: i32,
 }
 
 #[derive(Clone)]
@@ -114,7 +119,12 @@ fn main() {
         char_data.playtime = package.playtime.parse().unwrap();
         char_data.appearance.height = package.height;
         char_data.appearance.bust_size = package.bust_size;
-        char_data.currencies.gil = package.gil;
+        char_data.currencies.gil = package.gil; // TODO: also fetch from the lodestone
+        char_data.is_battle_mentor = package.is_battle_mentor;
+        char_data.is_trade_mentor = package.is_trade_mentor;
+        char_data.is_novice = package.is_novice;
+        char_data.is_returner = package.is_returner;
+        char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
     }
 
     let serialized = serde_json::to_string(&char_data).unwrap();
