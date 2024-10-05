@@ -23,16 +23,18 @@ This tool makes several HTTP requests to the Lodestone, but they currently are o
 
 ## Supported Data
 
-| Data                      | Supported | Notes                                            |
-|---------------------------|-----------|--------------------------------------------------|
-| Name                      | ✅         |                                                  |
-| World/Data Center         | ✅         |                                                  |
-| Race/Subrace/Gender       | ✅         |                                                  |
-| City-state                | ✅         |                                                  |
-| Nameday                   | ✅         |                                                  |
-| Guardian                  | ✅         |                                                  |
-| Portrait/Full-body Images | ✅         | These are the images displayed on the Lodestone. |
-| Playtime                  | ✅         | Requires the Dalamud plugin.                     |
+| Data                      | Supported | Notes                                                       |
+|---------------------------|-----------|-------------------------------------------------------------|
+| Name                      | ✅         |                                                             |
+| World/Data Center         | ✅         |                                                             |
+| Race/Subrace/Gender       | ✅         |                                                             |
+| City-state                | ✅         |                                                             |
+| Nameday                   | ✅         |                                                             |
+| Guardian                  | ✅         |                                                             |
+| Portrait/Full-body Images | ✅         | These are the images displayed on the Lodestone.            |
+| Playtime                  | ✅         | Requires the Dalamud plugin.                                |
+| Currencies                | 〰️        | Only gil is supported, and requires the Dalamud plugin.     |
+| Appearance Data           | 〰️        | Only some appearance data, and requires the Dalamud plugin. |
 
 Currently, more types of data is planned to be supported in the future.
 
