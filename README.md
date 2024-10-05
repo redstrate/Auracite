@@ -21,6 +21,15 @@ viewed locally in your browser.
 This tool makes several HTTP requests to the Lodestone, but they currently are only a few. The tool does not contact any
 3rd-party external services.
 
+### Dalamud Mode
+
+Auracite can only collect so much data from the Lodestone, some data can only be collected when logged in. To do this,
+we provide a Dalamud plugin to run alongside the tool. The plugin is currently available
+[in my personal Dalamud repository](https://github.com/redstrate/DalamudPlugins).
+
+When running the tool, append the `--dalamud` argument. It will walk you through starting the plugin. The plugin can be
+safely removed if you're done using Auracite.
+
 ## Supported Data
 
 | Data                      | Supported | Notes                                                                             |
