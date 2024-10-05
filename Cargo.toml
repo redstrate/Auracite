@@ -5,11 +5,22 @@ edition = "2021"
 description = "Export your FFXIV character in portable, generic formats"
 
 [dependencies]
+# Used to scrape the Lodestone HTML pages
 scraper = "0.20"
+
+# Used to serialize the JSON data we export
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
+
+# Used to do some misc regex operations during scraping
 regex = "1.11"
+
+# CLI interface
 clap = { version = "4.5", features = ["derive"] }
 clap_derive = "4.5"
+
+# Download HTML pages, images, etc
 downloader = "0.2"
+
+# Used to generate the HTML page to easily preview your exported data
 minijinja = "2.0"
