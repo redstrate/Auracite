@@ -32,6 +32,7 @@ This tool makes several HTTP requests to the Lodestone, but they currently are o
 | Nameday                   | ✅         |                                                  |
 | Guardian                  | ✅         |                                                  |
 | Portrait/Full-body Images | ✅         | These are the images displayed on the Lodestone. |
+| Playtime                  | ✅         | Requires the Dalamud plugin.                     |
 
 Currently, more types of data is planned to be supported in the future.
 
