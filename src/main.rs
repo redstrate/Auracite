@@ -9,6 +9,7 @@ use std::path::Path;
 use std::sync::{Arc, Mutex};
 use touche::server::Service;
 use touche::{Body, HttpBody, Request, Response, Server, StatusCode};
+use auracite::archive_character;
 
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
 
@@ -66,78 +67,6 @@ fn main() {
     let args = Args::parse();
 
     println!("Downloading character data for {}...", args.name);
-
-    let search_page_path = Path::new("/tmp/search.html");
-    download(
-        &format!("{LODESTONE_HOST}/lodestone/character/?q={}", args.name),
-        search_page_path,
-    )
-        .expect("Failed to download the search page from the Lodestone.");
-
-    let href = parse_search(&String::from_utf8(read(search_page_path).unwrap()).unwrap());
-    if href.is_empty() {
-        println!("Unable to find character!");
-    }
-
-    let char_page_path = Path::new("/tmp/character.html");
-    download(&format!("{LODESTONE_HOST}{}", href), char_page_path)
-        .expect("Failed to download the character page from the Lodestone.");
-
-    let mut char_data = parse_lodestone(&String::from_utf8(read(char_page_path).unwrap()).unwrap());
-
-    let character_folder = Path::new(&args.name);
-    if !character_folder.exists() {
-        std::fs::create_dir(character_folder).unwrap();
-    }
-
-    if !char_data.portrait_url.is_empty() {
-        download(
-            &char_data.portrait_url,
-            &character_folder.join("portrait.jpg"),
-        )
-            .expect("Failed to download the character portrait image.");
-    }
-    if !char_data.face_url.is_empty() {
-        download(&char_data.face_url, &character_folder.join("face.jpg"))
-            .expect("Failed to download the character face image.");
-    }
-
-    if args.dalamud {
-        println!("Now waiting for the Dalamud plugin. Type /auracite begin in chat.");
-
-        let package = Arc::new(Mutex::new(Package::default()));
-
-        Server::bind("0.0.0.0:8000").serve_single_thread(PackageService { wants_stop: Arc::new(Mutex::new(false)), package: &package }).unwrap();
-
-        let package = &*package.lock().unwrap();
-
-        char_data.playtime = package.playtime.parse().unwrap();
-        char_data.appearance.height = package.height;
-        char_data.appearance.bust_size = package.bust_size;
-        char_data.currencies.gil = package.gil; // TODO: also fetch from the lodestone
-        char_data.is_battle_mentor = package.is_battle_mentor;
-        char_data.is_trade_mentor = package.is_trade_mentor;
-        char_data.is_novice = package.is_novice;
-        char_data.is_returner = package.is_returner;
-        char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
-    }
-
-    let serialized = serde_json::to_string(&char_data).unwrap();
-    write(character_folder.join("character.json"), serialized)
-        .expect("Failed to write the character JSON file.");
-
-    println!(
-        "Download complete! The archive is located at: {}",
-        character_folder.file_name().unwrap().to_str().unwrap()
-    );
-
-    write_html(
-        &char_data,
-        &character_folder
-            .join("character.html")
-            .into_os_string()
-            .into_string()
-            .unwrap(),
-    )
-        .expect("Failed to write the character HTML file.");
+    
+    archive_character(&args.name, args.dalamud);
 }

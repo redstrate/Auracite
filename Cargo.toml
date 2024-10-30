@@ -30,6 +30,9 @@ minijinja = "2.0"
 # TODO: upstream this or poke upstream to add this
 touche = { git = "https://github.com/redstrate/touche" }
 
+# Used to generate the WebAssembly version
+wasm-bindgen = "0.2.95"
+
 # Not used directly by us, but to disable the "std" feature and is used by the scraper crate.
 ahash = { version = "0.8.0", default-features = false }
 
