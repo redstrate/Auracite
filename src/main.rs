@@ -1,11 +1,6 @@
-mod data;
-mod downloader;
-mod html;
-mod parser;
-
-use crate::downloader::download;
-use crate::html::write_html;
-use crate::parser::{parse_lodestone, parse_search};
+use auracite::downloader::download;
+use auracite::html::write_html;
+use auracite::parser::{parse_lodestone, parse_search};
 use clap::Parser;
 use serde::Deserialize;
 use std::convert::Infallible;
