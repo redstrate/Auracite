@@ -10,7 +10,6 @@ use std::sync::{Arc, Mutex};
 use reqwest::Url;
 use touche::server::Service;
 use touche::{Body, HttpBody, Request, Response, Server, StatusCode};
-use wasm_bindgen::prelude::wasm_bindgen;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 use crate::downloader::download;
@@ -18,6 +17,8 @@ use crate::html::create_html;
 use crate::parser::parse_search;
 #[cfg(target_family = "wasm")]
 use base64::prelude::*;
+#[cfg(target_family = "wasm")]
+use wasm_bindgen::prelude::wasm_bindgen;
 
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
 

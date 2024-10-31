@@ -17,39 +17,34 @@ required-features = ["ui"]
 
 [features]
 # Builds the Qt UI for Auracite
-ui = []# ["cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-kde-frameworks"]
+ui = ["cxx", "cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-kde-frameworks"]
 
 # Builds the CLI for Auracite
 cli = ["clap", "clap_derive"]
 
 [build-dependencies]
-cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"] }
+cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"], default-features = false, optional = true }
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-scraper = "0.21"
+scraper = { version ="0.21", default-features = false }
 
 # Used to serialize the JSON data we export
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"], default-features = false }
 
 # Used to do some misc regex operations during scraping
-regex = "1.11"
+regex = { version = "1.11", default-features = false, features = ["unicode-perl"] }
 
 # Used to generate the HTML page to easily preview your exported data
-minijinja = "2.0"
+minijinja = { version = "2.0", default-features = false }
 
 # Used to communicate with the Dalamud plugin
 # Needs my fork for allowing server shutdown
 # TODO: upstream this or poke upstream to add this
-touche = { git = "https://github.com/redstrate/touche" }
+touche = { git = "https://github.com/redstrate/touche", default-features = false, features = ["server"] }
 
-# Used to generate the WebAssembly version
-wasm-bindgen = "0.2.95"
-wasm-bindgen-futures = "0.4"
-
-# Download files on WebAssembly
-reqwest = { version = "0.12" }
+# Download files
+reqwest = { version = "0.12", default-features = false, features = ["native-tls"] }
 
 # Zip the character archive
 zip = { version = "2.2", default-features = false }
@@ -58,31 +53,33 @@ zip = { version = "2.2", default-features = false }
 ahash = { version = "0.8.0", default-features = false }
 
 # Ditto, but used by the ahash crate.
-getrandom = { version = "0.2", features = ["js"] }
+getrandom = { version = "0.2", features = ["js"], default-features = false }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-# Used to access Web APIs in WebAssembly
-web-sys = { version = "0.3", features = ["console"] }
+# Used to generate the WebAssembly version
+wasm-bindgen = { version = "0.2.95", default-features = false }
+wasm-bindgen-futures = { version = "0.4", default-features = false }
 
 # For async
-tokio = { version = "1.41", features = ["rt", "macros"] }
+tokio = { version = "1.41", features = ["rt", "macros"], default-features = false }
 
 # Encoding the character archive to base64 so the browser can download it
-base64 = "0.22"
+base64 = { version = "0.22", default-features = false }
+
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # For async
-tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"] }
-
-# Download files
-http_req = "0.13"
+tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
 
 # CLI interface
-clap = { version = "4.5", features = ["derive"], optional = true }
-clap_derive = { version = "4.5", optional = true }
+clap = { version = "4.5", features = ["derive"], default-features = false, optional = true }
+clap_derive = { version = "4.5", default-features = false, optional = true }
 
 # Used for the Qt UI
-cxx = "1.0"
-cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main" }
-cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["full"] }
-cxx-kde-frameworks = { git = "https://github.com/mystchonky/cxx-kde-frameworks", branch = "master" }
+cxx = { version = "1.0", default-features = false, optional = true }
+cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true }
+cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true}
+cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "master", default-features = false, optional = true }
+
+serde_json = { version = "1.0", default-features = false, features = ["std"] }
