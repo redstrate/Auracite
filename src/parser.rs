@@ -7,8 +7,14 @@ const ENTRY_NAME_SELECTOR: &str = ".entry__name";
 
 /// Parses the HTML from `data` and returns the relative Lodestone URL for the first search entry.
 pub fn parse_search(data: &str) -> String {
+    #[cfg(target_family = "wasm")]
+    web_sys::console::log_1(&"parsing doc...".into());
+
     let document = Html::parse_document(data);
     let mut href = String::new();
+
+    #[cfg(target_family = "wasm")]
+    web_sys::console::log_1(&"done!".into());
 
     for element in document.select(&Selector::parse(ENTRY_SELECTOR).unwrap()) {
         if let Some(block_name) = element

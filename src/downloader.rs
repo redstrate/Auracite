@@ -1,35 +1,13 @@
-#[cfg(not(target_family = "wasm"))]
-use downloader::{Download, Downloader};
-use std::path::Path;
+use reqwest::Url;
 
-pub fn download(url: &str, path: &Path) -> Result<(), ()> {
-    #[cfg(target_family = "wasm")]
-    {
-        // TODO: Implement
-        Ok(())
-    }
+pub async fn download(url: &Url) -> Result<Vec<u8>, ()> {
+    let client = reqwest::Client::builder()
+        .build()
+        .unwrap();
     
-    #[cfg(not(target_family = "wasm"))]
-    {
-        let mut downloader = Downloader::builder().build().unwrap();
+    let body = client.get(url.to_string())
+        .send()
+        .await;
 
-        let mut dl = Download::new(url);
-        dl = dl.file_name(path);
-
-        if !path.exists() {
-            let result = downloader.download(&[dl]).unwrap();
-
-            for r in result {
-                return match r {
-                    Err(e) => {
-                        println!("Error: {}", e.to_string());
-                        Err(())
-                    }
-                    Ok(s) => Ok(()),
-                };
-            }
-        }
-
-        Ok(())
-    }
+    Ok(body.unwrap().bytes().await.unwrap().to_vec())
 }

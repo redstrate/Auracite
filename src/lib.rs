@@ -3,18 +3,21 @@ pub mod downloader;
 pub mod html;
 pub mod parser;
 
-use clap::Parser;
 use serde::Deserialize;
 use std::convert::Infallible;
-use std::fs::{read, write};
-use std::path::Path;
+use std::io::Write;
 use std::sync::{Arc, Mutex};
+use reqwest::Url;
 use touche::server::Service;
 use touche::{Body, HttpBody, Request, Response, Server, StatusCode};
 use wasm_bindgen::prelude::wasm_bindgen;
+use zip::write::SimpleFileOptions;
+use zip::ZipWriter;
 use crate::downloader::download;
 use crate::html::write_html;
 use crate::parser::parse_search;
+#[cfg(target_family = "wasm")]
+use base64::prelude::*;
 
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
 
@@ -58,41 +61,50 @@ impl Service for PackageService<'_> {
     }
 }
 
-#[wasm_bindgen]
-pub extern fn archive_character(character_name: &str, use_dalamud: bool) {
-    let search_page_path = Path::new("/tmp/search.html");
-    download(
-        &format!("{LODESTONE_HOST}/lodestone/character/?q={}", character_name),
-        search_page_path,
-    )
+/// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
+pub async extern fn archive_character(character_name: &str, use_dalamud: bool) -> Vec<u8> {
+    let search_page = download(&Url::parse_with_params(&format!("{LODESTONE_HOST}/lodestone/character?"), &[("q", character_name)]).unwrap())
+        .await
         .expect("Failed to download the search page from the Lodestone.");
 
-    let href = parse_search(&String::from_utf8(read(search_page_path).unwrap()).unwrap());
+    let href = parse_search(&String::from_utf8(search_page).unwrap());
     if href.is_empty() {
         println!("Unable to find character!");
     }
 
-    let char_page_path = Path::new("/tmp/character.html");
-    download(&format!("{LODESTONE_HOST}{}", href), char_page_path)
+    let char_page = download(&Url::parse(&format!("{LODESTONE_HOST}{}", href)).unwrap())
+        .await
         .expect("Failed to download the character page from the Lodestone.");
 
-    let mut char_data = crate::parser::parse_lodestone(&String::from_utf8(read(char_page_path).unwrap()).unwrap());
+    let mut char_data = crate::parser::parse_lodestone(&String::from_utf8(char_page).unwrap());
 
-    let character_folder = Path::new(&character_name);
-    if !character_folder.exists() {
-        std::fs::create_dir(character_folder).unwrap();
-    }
+    // 2 MiB, for one JSON and two images
+    let mut buf = vec![0; 2097152];
+    let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf[..]));
+
+    let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
+    zip.start_file("character.json", options);
+    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref());
 
     if !char_data.portrait_url.is_empty() {
-        download(
-            &char_data.portrait_url,
-            &character_folder.join("portrait.jpg"),
-        )
+        let portrait_url = char_data.portrait_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+
+        let portrait = download(&Url::parse(&portrait_url).unwrap())
+            .await
             .expect("Failed to download the character portrait image.");
+
+        zip.start_file("portrait.jpg", options);
+        zip.write_all(&*portrait);
     }
     if !char_data.face_url.is_empty() {
-        download(&char_data.face_url, &character_folder.join("face.jpg"))
+        let face_url = char_data.face_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+
+        let face = download(&Url::parse(&face_url).unwrap())
+            .await
             .expect("Failed to download the character face image.");
+
+        zip.start_file("face.jpg", options);
+        zip.write_all(&*face);
     }
 
     if use_dalamud {
@@ -115,16 +127,11 @@ pub extern fn archive_character(character_name: &str, use_dalamud: bool) {
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
     }
 
-    let serialized = serde_json::to_string(&char_data).unwrap();
-    write(character_folder.join("character.json"), serialized)
-        .expect("Failed to write the character JSON file.");
+    zip.finish();
 
-    println!(
-        "Download complete! The archive is located at: {}",
-        character_folder.file_name().unwrap().to_str().unwrap()
-    );
+    return buf;
 
-    write_html(
+    /*write_html(
         &char_data,
         &character_folder
             .join("character.html")
@@ -132,5 +139,16 @@ pub extern fn archive_character(character_name: &str, use_dalamud: bool) {
             .into_string()
             .unwrap(),
     )
-        .expect("Failed to write the character HTML file.");
+        .expect("Failed to write the character HTML file.");*/
+}
+
+
+/// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen]
+pub async extern fn archive_character_base64(character_name: &str, use_dalamud: bool) -> String {
+    let buf = archive_character(character_name, use_dalamud).await;
+
+    let base64 = BASE64_STANDARD.encode(buf);
+    return format!("data:application/octet-stream;charset=utf-16le;base64,{base64}").into();
 }

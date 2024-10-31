@@ -6,6 +6,15 @@ description = "Export your FFXIV character in portable, generic formats"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+[features]
+# Builds the Qt UI for Auracite
+ui = []# ["cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-kde-frameworks"]
+
+# Builds the CLI for Auracite
+cli = ["clap", "clap_derive"]
+
+[build-dependencies]
+cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"] }
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
@@ -18,10 +27,6 @@ serde_json = "1.0"
 # Used to do some misc regex operations during scraping
 regex = "1.11"
 
-# CLI interface
-clap = { version = "4.5", features = ["derive"] }
-clap_derive = "4.5"
-
 # Used to generate the HTML page to easily preview your exported data
 minijinja = "2.0"
 
@@ -32,6 +37,13 @@ touche = { git = "https://github.com/redstrate/touche" }
 
 # Used to generate the WebAssembly version
 wasm-bindgen = "0.2.95"
+wasm-bindgen-futures = "0.4"
+
+# Download files on WebAssembly
+reqwest = { version = "0.12" }
+
+# Zip the character archive
+zip = { version = "2.2", default-features = false }
 
 # Not used directly by us, but to disable the "std" feature and is used by the scraper crate.
 ahash = { version = "0.8.0", default-features = false }
@@ -39,6 +51,29 @@ ahash = { version = "0.8.0", default-features = false }
 # Ditto, but used by the ahash crate.
 getrandom = { version = "0.2", features = ["js"] }
 
+[target.'cfg(target_family = "wasm")'.dependencies]
+# Used to access Web APIs in WebAssembly
+web-sys = { version = "0.3", features = ["console"] }
+
+# For async
+tokio = { version = "1.41", features = ["rt", "macros"] }
+
+# Encoding the character archive to base64 so the browser can download it
+base64 = "0.22"
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-# Download HTML pages, images, etc
-downloader = "0.2"
+# For async
+tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"] }
+
+# Download files
+http_req = "0.13"
+
+# CLI interface
+clap = { version = "4.5", features = ["derive"], optional = true }
+clap_derive = { version = "4.5", optional = true }
+
+# Used for the Qt UI
+cxx = "1.0"
+cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main" }
+cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["full"] }
+cxx-kde-frameworks = { git = "https://github.com/mystchonky/cxx-kde-frameworks", branch = "master" }
