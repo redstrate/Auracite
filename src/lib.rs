@@ -14,7 +14,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 use crate::downloader::download;
-use crate::html::{create_html, write_html};
+use crate::html::create_html;
 use crate::parser::parse_search;
 #[cfg(target_family = "wasm")]
 use base64::prelude::*;
