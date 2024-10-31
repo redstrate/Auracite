@@ -18,9 +18,8 @@ pub mod bridge {
     }
 }
 
-use std::fs::write;
+use crate::archive_character_blocking;
 use cxx_qt_lib::QString;
-use auracite::archive_character;
 
 #[derive(Default)]
 pub struct BackendRust {
@@ -28,12 +27,6 @@ pub struct BackendRust {
 
 impl bridge::Backend {
     pub fn archive_character(&self, character_name: &QString, use_dalamud: bool) {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        
-        let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud));
-        write("/home/josh/test.zip", inner);
+        archive_character_blocking(&character_name.to_string(), use_dalamud);
     }
 }

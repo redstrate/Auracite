@@ -8,19 +8,12 @@ description = "Export your FFXIV character in portable, generic formats"
 crate-type = ["cdylib", "rlib"]
 
 [[bin]]
-name = "cli"
-required-features = ["cli"]
-
-[[bin]]
 name = "ui"
 required-features = ["ui"]
 
 [features]
 # Builds the Qt UI for Auracite
-ui = ["cxx", "cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-kde-frameworks"]
-
-# Builds the CLI for Auracite
-cli = ["clap", "clap_derive"]
+ui = ["cxx", "cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-qt-lib-extras", "cxx-kde-frameworks"]
 
 [build-dependencies]
 cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"], default-features = false, optional = true }
@@ -72,14 +65,11 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 # For async
 tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
 
-# CLI interface
-clap = { version = "4.5", features = ["derive"], default-features = false, optional = true }
-clap_derive = { version = "4.5", default-features = false, optional = true }
-
 # Used for the Qt UI
 cxx = { version = "1.0", default-features = false, optional = true }
 cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true }
 cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true}
-cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "master", default-features = false, optional = true }
+cxx-qt-lib-extras = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true}
+cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "work/redstrate/kaboutdata-process-cmdline", default-features = false, optional = true }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
