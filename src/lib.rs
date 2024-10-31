@@ -63,7 +63,7 @@ impl Service for PackageService<'_> {
 }
 
 /// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
-pub async extern fn archive_character(character_name: &str, use_dalamud: bool) -> Vec<u8> {
+pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Vec<u8> {
     let search_page = download(&Url::parse_with_params(&format!("{LODESTONE_HOST}/lodestone/character?"), &[("q", character_name)]).unwrap())
         .await
         .expect("Failed to download the search page from the Lodestone.");

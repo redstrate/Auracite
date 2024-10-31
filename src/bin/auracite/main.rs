@@ -69,7 +69,7 @@ fn main() {
     if let Some(mut engine) = engine.as_mut() {
         KLocalizedContext::initialize_engine(engine.as_mut().as_qqmlengine());
         // TODO: replace with loadModule (requires cxx-qt changes)
-        engine.load(&QUrl::from("qrc:/qt/qml/zone/xiv/auracite/src/bin/ui/Main.qml"));
+        engine.load(&QUrl::from("qrc:/qt/qml/zone/xiv/auracite/src/bin/auracite/Main.qml"));
     }
 
     if let Some(app) = app.as_mut() {

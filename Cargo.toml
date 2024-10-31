@@ -7,16 +7,8 @@ description = "Export your FFXIV character in portable, generic formats"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[[bin]]
-name = "ui"
-required-features = ["ui"]
-
-[features]
-# Builds the Qt UI for Auracite
-ui = ["cxx", "cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-qt-lib-extras", "cxx-kde-frameworks"]
-
 [build-dependencies]
-cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"], default-features = false, optional = true }
+cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"], default-features = false }
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
@@ -66,10 +58,10 @@ serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
 
 # Used for the Qt UI
-cxx = { version = "1.0", default-features = false, optional = true }
-cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true }
-cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true}
-cxx-qt-lib-extras = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false, optional = true}
-cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "work/redstrate/kaboutdata-process-cmdline", default-features = false, optional = true }
+cxx = { version = "1.0", default-features = false }
+cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
+cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
+cxx-qt-lib-extras = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
+cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "work/redstrate/kaboutdata-process-cmdline", default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
