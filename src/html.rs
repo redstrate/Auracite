@@ -1,7 +1,5 @@
 use crate::data::CharacterData;
 use minijinja::{context, Environment};
-use std::fs::write;
-use std::io;
 
 /// Writes a visual HTML for `char_data` to `file_path`.
 /// This vaguely represents Lodestone and designed to visually check your character data.

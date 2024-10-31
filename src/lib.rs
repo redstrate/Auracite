@@ -20,6 +20,8 @@ use crate::parser::parse_search;
 use base64::prelude::*;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
+#[cfg(target_family = "wasm")]
+use wasm_bindgen::JsValue;
 
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
 
@@ -80,6 +82,19 @@ impl From<ZipError> for ArchiveError {
 impl From<std::io::Error> for ArchiveError {
     fn from(_: std::io::Error) -> Self {
         ArchiveError::UnknownError
+    }
+}
+
+#[cfg(target_family = "wasm")]
+impl From<ArchiveError> for JsValue {
+    fn from(err: ArchiveError) -> Self {
+        match err {
+            // TODO: give JS the URL that failed to download
+            ArchiveError::DownloadFailed(_) => { JsValue::from_str(&"download_failed".to_string()) }
+            ArchiveError::CharacterNotFound => { JsValue::from_str(&"character_not_found".to_string()) }
+            ArchiveError::ParsingError => { JsValue::from_str(&"parsing_error".to_string())}
+            ArchiveError::UnknownError => { JsValue::from_str(&"unknown_error".to_string()) }
+        }
     }
 }
 
@@ -170,9 +185,7 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
 /// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.
 #[cfg(target_family = "wasm")]
 #[wasm_bindgen]
-pub async extern fn archive_character_base64(character_name: &str, use_dalamud: bool) -> String {
-    let buf = archive_character(character_name, use_dalamud).await;
-
-    let base64 = BASE64_STANDARD.encode(buf);
-    return format!("data:application/octet-stream;charset=utf-16le;base64,{base64}").into();
+pub async extern fn archive_character_base64(character_name: &str, use_dalamud: bool) -> Result<String, ArchiveError> {
+    let buf: String = archive_character(character_name, use_dalamud).await.map(|x| BASE64_STANDARD.encode(x))?;
+    return Ok(format!("data:application/octet-stream;charset=utf-16le;base64,{buf}").into());
 }

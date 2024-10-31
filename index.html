@@ -13,6 +13,9 @@
             archive_character_base64(document.getElementById("name").value, false).then((uri) => {
                 // Download character archive
                 window.location.replace(uri);
+                document.getElementById("statusMessage").innerText = "Archive complete!";
+            }).catch((err) => {
+                document.getElementById("statusMessage").innerText = err;
             });
         });
     }
@@ -54,5 +57,6 @@
 <label for="scales">Connect to Dalamud Plugin</label>
 <button class="favorite styled" type="button" id="downloadButton">Download</button>
 <a href="https://github.com/redstrate/Auracite">Source Code</a>
+<p id="statusMessage"></p>
 </body>
 </html>

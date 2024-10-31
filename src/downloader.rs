@@ -1,13 +1,12 @@
 use reqwest::Url;
 
-pub async fn download(url: &Url) -> Result<Vec<u8>, ()> {
+pub async fn download(url: &Url) -> Result<Vec<u8>, reqwest::Error> {
     let client = reqwest::Client::builder()
-        .build()
-        .unwrap();
+        .build()?;
     
     let body = client.get(url.to_string())
         .send()
         .await;
 
-    Ok(body.unwrap().bytes().await.unwrap().to_vec())
+    Ok(body?.bytes().await?.to_vec())
 }
