@@ -6,6 +6,15 @@ description = "Export your FFXIV character in portable, generic formats"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "cli"
+required-features = ["cli"]
+
+[[bin]]
+name = "ui"
+required-features = ["ui"]
+
 [features]
 # Builds the Qt UI for Auracite
 ui = []# ["cxx-qt-build", "cxx-qt", "cxx-qt-lib", "cxx-kde-frameworks"]

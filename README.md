@@ -8,6 +8,8 @@ you can display in your browser.
 
 ## Usage
 
+### CLI
+
 Provide a character name via `--name`:
 
 ```shell
