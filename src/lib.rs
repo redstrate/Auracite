@@ -10,6 +10,7 @@ use std::sync::{Arc, Mutex};
 use reqwest::Url;
 use touche::server::Service;
 use touche::{Body, HttpBody, Request, Response, Server, StatusCode};
+use zip::result::ZipError;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 use crate::downloader::download;
@@ -62,50 +63,76 @@ impl Service for PackageService<'_> {
     }
 }
 
-/// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
-pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Vec<u8> {
-    let search_page = download(&Url::parse_with_params(&format!("{LODESTONE_HOST}/lodestone/character?"), &[("q", character_name)]).unwrap())
-        .await
-        .expect("Failed to download the search page from the Lodestone.");
+#[derive(Debug)]
+pub enum ArchiveError {
+    DownloadFailed(String),
+    CharacterNotFound,
+    ParsingError,
+    UnknownError
+}
 
-    let href = parse_search(&String::from_utf8(search_page).unwrap());
+impl From<ZipError> for ArchiveError {
+    fn from(_: ZipError) -> Self {
+        ArchiveError::UnknownError
+    }
+}
+
+impl From<std::io::Error> for ArchiveError {
+    fn from(_: std::io::Error) -> Self {
+        ArchiveError::UnknownError
+    }
+}
+
+/// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
+pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Result<Vec<u8>, ArchiveError> {
+    let search_url = Url::parse_with_params(&format!("{LODESTONE_HOST}/lodestone/character?"), &[("q", character_name)]).map_err(|_| ArchiveError::UnknownError)?;
+    let search_page = download(&search_url)
+        .await
+        .map_err(|_| ArchiveError::DownloadFailed(search_url.to_string()))?;
+    let search_page = String::from_utf8(search_page).map_err(|_| ArchiveError::ParsingError)?;
+
+    let href = parse_search(&search_page);
     if href.is_empty() {
-        println!("Unable to find character!");
+        return Err(ArchiveError::CharacterNotFound);
     }
 
-    let char_page = download(&Url::parse(&format!("{LODESTONE_HOST}{}", href)).unwrap())
+    let char_page_url = Url::parse(&format!("{LODESTONE_HOST}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
+    let char_page = download(&char_page_url)
         .await
-        .expect("Failed to download the character page from the Lodestone.");
+        .map_err(|_| ArchiveError::DownloadFailed(char_page_url.to_string()))?;
+    let char_page = String::from_utf8(char_page).map_err(|_| ArchiveError::ParsingError)?;
 
-    let mut char_data = crate::parser::parse_lodestone(&String::from_utf8(char_page).unwrap());
+    let mut char_data = parser::parse_lodestone(&char_page);
 
     // 2 MiB, for one JSON and two images
     let mut buf = vec![0; 2097152];
     let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf[..]));
 
     let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
-    zip.start_file("character.json", options);
-    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref());
+    zip.start_file("character.json", options)?;
+    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
 
     if !char_data.portrait_url.is_empty() {
         let portrait_url = char_data.portrait_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+        let portrait_url = Url::parse(&portrait_url).map_err(|_| ArchiveError::UnknownError)?;
 
-        let portrait = download(&Url::parse(&portrait_url).unwrap())
+        let portrait = download(&portrait_url)
             .await
-            .expect("Failed to download the character portrait image.");
+            .map_err(|_| ArchiveError::DownloadFailed(portrait_url.to_string()))?;
 
-        zip.start_file("portrait.jpg", options);
-        zip.write_all(&*portrait);
+        zip.start_file("portrait.jpg", options)?;
+        zip.write_all(&*portrait)?;
     }
     if !char_data.face_url.is_empty() {
         let face_url = char_data.face_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+        let face_url = Url::parse(&face_url).map_err(|_| ArchiveError::UnknownError)?;
 
-        let face = download(&Url::parse(&face_url).unwrap())
+        let face = download(&face_url)
             .await
-            .expect("Failed to download the character face image.");
+            .map_err(|_| ArchiveError::DownloadFailed(face_url.to_string()))?;
 
-        zip.start_file("face.jpg", options);
-        zip.write_all(&*face);
+        zip.start_file("face.jpg", options)?;
+        zip.write_all(&*face)?;
     }
 
     if use_dalamud {
@@ -137,7 +164,7 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Vec<u
 
     zip.finish();
 
-    return buf;
+    Ok(buf)
 }
 
 /// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.

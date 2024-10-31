@@ -14,7 +14,7 @@ fn archive_character_blocking(character_name: &String, use_dalamud: bool) {
         .build()
         .unwrap();
 
-    let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud));
+    let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud)).unwrap();
     write("/home/josh/test.zip", inner);
 }
 
