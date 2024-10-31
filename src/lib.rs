@@ -14,7 +14,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 use crate::downloader::download;
-use crate::html::write_html;
+use crate::html::{create_html, write_html};
 use crate::parser::parse_search;
 #[cfg(target_family = "wasm")]
 use base64::prelude::*;
@@ -127,21 +127,17 @@ pub async extern fn archive_character(character_name: &str, use_dalamud: bool) -
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
     }
 
+    let html = create_html(
+        &char_data
+    );
+
+    zip.start_file("character.html", options);
+    zip.write_all(html.as_ref());
+
     zip.finish();
 
     return buf;
-
-    /*write_html(
-        &char_data,
-        &character_folder
-            .join("character.html")
-            .into_os_string()
-            .into_string()
-            .unwrap(),
-    )
-        .expect("Failed to write the character HTML file.");*/
 }
-
 
 /// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.
 #[cfg(target_family = "wasm")]

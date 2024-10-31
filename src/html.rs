@@ -5,7 +5,7 @@ use std::io;
 
 /// Writes a visual HTML for `char_data` to `file_path`.
 /// This vaguely represents Lodestone and designed to visually check your character data.
-pub fn write_html(char_data: &CharacterData, file_path: &str) -> io::Result<()> {
+pub fn create_html(char_data: &CharacterData) -> String {
     let mut env = Environment::new();
     env.add_template(
         "character.html",
@@ -13,7 +13,7 @@ pub fn write_html(char_data: &CharacterData, file_path: &str) -> io::Result<()> 
     )
     .unwrap();
     let template = env.get_template("character.html").unwrap();
-    let character_html = template
+    template
         .render(context! {
             name => char_data.name,
             world => char_data.world,
@@ -24,7 +24,5 @@ pub fn write_html(char_data: &CharacterData, file_path: &str) -> io::Result<()> 
             nameday => char_data.nameday,
             city_state => char_data.city_state
         })
-        .unwrap();
-
-    write(file_path, &character_html)
+        .unwrap()
 }
