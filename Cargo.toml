@@ -3,6 +3,8 @@ name = "auracite"
 version = "0.1.0"
 edition = "2021"
 description = "Export your FFXIV character in portable, generic formats"
+repository = "https://github.com/redstrate/Auracite"
+license = "AGPL-3"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
