@@ -1,6 +1,6 @@
 use std::env::args;
 use std::fs::write;
-use cxx_kde_frameworks::kcoreaddons::{KAboutData, License};
+use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAuthor, License};
 use cxx_kde_frameworks::ki18n::{i18n, i18nc, KLocalizedContext, KLocalizedString};
 use cxx_qt_lib::{QByteArray, QGuiApplication, QList, QQmlApplicationEngine, QQuickStyle, QString, QStringList, QUrl};
 use cxx_qt_lib_extras::{QCommandLineOption, QCommandLineParser};
@@ -35,11 +35,20 @@ fn main() {
         License::GPL_V3,
     );
 
-    KAboutData::set_application_data(about_data.as_ref().unwrap());
 
     let Some(mut about_data) = about_data.as_mut() else {
         return;
     };
+
+    about_data.as_mut().add_author(KAuthor {
+        name: i18n("Joshua Goins"),
+        task: i18n("Maintainer"),
+        email_address: QString::from("josh@redstrate.com"),
+        web_address: QString::from("https://redstrate.com"),
+        avatar_url: QUrl::from(&QString::from("https://redstrate.com/rss-image.png")),
+    });
+
+    KAboutData::set_application_data(&*about_data);
 
     let mut command_line_parser = QCommandLineParser::default();
     about_data.as_mut().setup_command_line(&mut command_line_parser);
