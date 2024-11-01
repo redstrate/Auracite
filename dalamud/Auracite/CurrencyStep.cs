@@ -27,4 +27,8 @@ public class CurrencyStep : IStep
     {
         return "No user action required.";
     }
+
+    public void Dispose()
+    {
+    }
 }

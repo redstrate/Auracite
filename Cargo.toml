@@ -23,13 +23,8 @@ regex = { version = "1.11", default-features = false, features = ["unicode-perl"
 # Used to generate the HTML page to easily preview your exported data
 minijinja = { version = "2.0", default-features = false }
 
-# Used to communicate with the Dalamud plugin
-# Needs my fork for allowing server shutdown
-# TODO: upstream this or poke upstream to add this
-touche = { git = "https://github.com/redstrate/touche", default-features = false, features = ["server"] }
-
 # Download files
-reqwest = { version = "0.12", default-features = false, features = ["native-tls"] }
+reqwest = { version = "0.12" }
 
 # Zip the character archive
 zip = { version = "2.2", default-features = false }

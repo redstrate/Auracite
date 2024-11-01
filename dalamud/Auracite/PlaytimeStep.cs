@@ -4,7 +4,7 @@ using Dalamud.Game.Text.SeStringHandling;
 
 namespace Auracite;
 
-public class PlaytimeStep : IStep, IDisposable
+public class PlaytimeStep : IStep
 {
     public PlaytimeStep()
     {

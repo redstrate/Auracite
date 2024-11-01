@@ -30,4 +30,8 @@ public class MiscStep : IStep
     {
         return "No user action required.";
     }
+
+    public void Dispose()
+    {
+    }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace Auracite;
 
-public interface IStep
+public interface IStep : IDisposable
 {
     public event CompletedDelegate Completed;
 

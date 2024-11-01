@@ -18,9 +18,13 @@ Kirigami.ApplicationWindow {
             placeholderText: "Full name of the character"
         }
 
+        QQC2.CheckBox {
+            id: dalamudCheckbox
+        }
+
         QQC2.Button {
             text: "Archive"
-            onClicked: root.backend.archiveCharacter(characterNameField.text, false)
+            onClicked: root.backend.archiveCharacter(characterNameField.text, dalamudCheckbox.checked)
         }
     }
 

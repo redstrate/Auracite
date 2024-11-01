@@ -8,8 +8,6 @@ use std::convert::Infallible;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
 use reqwest::Url;
-use touche::server::Service;
-use touche::{Body, HttpBody, Request, Response, Server, StatusCode};
 use zip::result::ZipError;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
@@ -38,38 +36,12 @@ struct Package {
     player_commendations: i32,
 }
 
-#[derive(Clone)]
-struct PackageService<'a> {
-    wants_stop: Arc<Mutex<bool>>, // TODO: THIS IS TERRIBLE STOP STOP STOP
-    package: &'a Arc<Mutex<Package>>,
-}
-
-impl Service for PackageService<'_> {
-    type Body = &'static str;
-    type Error = Infallible;
-
-    fn call(&self, req: Request<Body>) -> Result<Response<Self::Body>, Self::Error> {
-        *self.package.lock().unwrap() = serde_json::from_str(&String::from_utf8(req.into_body().into_bytes().unwrap()).unwrap()).unwrap();
-
-        *self.wants_stop.lock().unwrap() = true;
-
-        Ok(Response::builder()
-            .status(StatusCode::OK)
-            .body("")
-            .unwrap())
-    }
-
-    // TODO: NO NO NO NO
-    fn wants_stop(&self) -> bool {
-        *self.wants_stop.lock().unwrap()
-    }
-}
-
 #[derive(Debug)]
 pub enum ArchiveError {
     DownloadFailed(String),
     CharacterNotFound,
     ParsingError,
+    CouldNotConnectToDalamud,
     UnknownError
 }
 
@@ -124,8 +96,6 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf[..]));
 
     let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
-    zip.start_file("character.json", options)?;
-    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
 
     if !char_data.portrait_url.is_empty() {
         let portrait_url = char_data.portrait_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
@@ -151,13 +121,12 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     }
 
     if use_dalamud {
-        println!("Now waiting for the Dalamud plugin. Type /auracite begin in chat.");
-
-        let package = Arc::new(Mutex::new(Package::default()));
-
-        Server::bind("0.0.0.0:8000").serve_single_thread(PackageService { wants_stop: Arc::new(Mutex::new(false)), package: &package }).unwrap();
-
-        let package = &*package.lock().unwrap();
+        let dalamud_url = Url::parse(&"http://localhost:42072/package").map_err(|_| ArchiveError::UnknownError)?;
+        let package = download(&dalamud_url).await.map_err(|_| ArchiveError::CouldNotConnectToDalamud)?;
+        let package = String::from_utf8(package).map_err(|_| ArchiveError::ParsingError)?;
+        // Remove BOM at the start
+        let package = package.trim_start_matches("\u{feff}");
+        let package: Package = serde_json::from_str(&package.trim_start()).unwrap();
 
         char_data.playtime = package.playtime.parse().unwrap();
         char_data.appearance.height = package.height;
@@ -170,14 +139,17 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
     }
 
+    zip.start_file("character.json", options)?;
+    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
+
     let html = create_html(
         &char_data
     );
 
-    zip.start_file("character.html", options);
-    zip.write_all(html.as_ref());
+    zip.start_file("character.html", options)?;
+    zip.write_all(html.as_ref())?;
 
-    zip.finish();
+    zip.finish()?;
 
     Ok(buf)
 }

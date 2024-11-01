@@ -40,13 +40,14 @@ impl bridge::Backend {
     pub fn archive_character(mut self: Pin<&mut Self>, character_name: &QString, use_dalamud: bool) {
         match archive_character_blocking(&character_name.to_string(), use_dalamud) {
             Ok(_) => { self.archive_successful() }
-            Err(err) => { 
+            Err(err) => {
                 match err {
                     // TODO: Pass the URL up
                     ArchiveError::DownloadFailed(_) => { self.archive_failed(&i18n("Download failed")) }
                     ArchiveError::CharacterNotFound => { self.archive_failed(&i18n("Character not found")) }
                     ArchiveError::ParsingError => { self.archive_failed(&i18n("Parsing error")) }
                     ArchiveError::UnknownError => { self.archive_failed(&i18n("Unknown error")) }
+                    ArchiveError::CouldNotConnectToDalamud => { self.archive_failed(&i18n("Could not connect to Dalamud plugin")) }
                 }
             }
         }

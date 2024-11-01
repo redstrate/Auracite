@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using EmbedIO;
+using EmbedIO.Routing;
+using EmbedIO.WebApi;
 using Newtonsoft.Json;
 
 namespace Auracite;
@@ -16,7 +21,7 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(MiscStep), typeof(PlaytimeStep)];
+        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(MiscStep), typeof(PlaytimeStep), typeof(EndStep)];
 
     private int _stepIndex;
 
@@ -60,6 +65,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        CurrentStep?.Dispose();
         WindowSystem.RemoveAllWindows();
     }
 
@@ -79,20 +85,13 @@ public sealed class Plugin : IDalamudPlugin
         _stepIndex++; 
         if (_stepIndex >= _steps.Count)
         {
+            CurrentStep?.Dispose();
             CurrentStep = null;
             StepWindow.IsOpen = false;
-            SendPackage();
             return;
         }
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
         CurrentStep.Run();
-    }
-
-    private void SendPackage()
-    {
-        var client = new HttpClient();
-        client.PostAsync("http://127.0.0.1:8000/package", new StringContent(JsonConvert.SerializeObject(package)));
-        package = null;
     }
 }
