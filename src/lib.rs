@@ -273,8 +273,8 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         }
 
         // Stop the HTTP server
-        //let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
-        //download(&stop_url).await;
+        let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
+        download(&stop_url).await;
     }
 
     let char_dat = physis::chardat::CharacterData {
