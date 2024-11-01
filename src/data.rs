@@ -51,6 +51,10 @@ pub struct CharacterData {
     pub is_novice: bool,
     pub is_returner: bool,
     pub player_commendations: i32,
+    pub plate_title: String,
+    pub plate_classjob: String,
+    pub plate_classjob_level: i32,
+    pub search_comment: String,
 
     #[serde(skip)]
     pub face_url: String,

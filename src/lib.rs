@@ -11,7 +11,7 @@ use zip::result::ZipError;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 use crate::downloader::download;
-use crate::html::create_html;
+use crate::html::{create_character_html, create_plate_html};
 use crate::parser::parse_search;
 use base64::prelude::*;
 #[cfg(target_family = "wasm")]
@@ -47,6 +47,14 @@ struct Package {
     pub plate_class_job: String,
     pub plate_class_job_level: i32,
     pub search_comment: String,
+    pub base_plate: Option<String>,
+    pub pattern_overlay: Option<String>,
+    pub backing: Option<String>,
+    pub top_border: Option<String>,
+    pub bottom_border: Option<String>,
+    pub portrait_frame: Option<String>,
+    pub plate_frame: Option<String>,
+    pub accent: Option<String>,
 
     // Appearance
     pub race: i32,
@@ -216,13 +224,57 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         char_data.is_novice = package.is_novice;
         char_data.is_returner = package.is_returner;
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
+        char_data.plate_title = package.plate_title;
+        char_data.plate_classjob = package.plate_class_job;
+        char_data.plate_classjob_level = package.plate_class_job_level;
+        char_data.search_comment = package.search_comment;
 
         zip.start_file("plate-portrait.png", options)?;
         zip.write_all(&*BASE64_STANDARD.decode(package.portrait.trim_start_matches("data:image/png;base64,")).unwrap())?;
 
+        if let Some(base_plate) = package.base_plate {
+            zip.start_file("base-plate.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(base_plate.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(pattern_overlay) = package.pattern_overlay {
+            zip.start_file("pattern-overlay.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(pattern_overlay.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(backing) = package.backing {
+            zip.start_file("backing.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(backing.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(top_border) = package.top_border {
+            zip.start_file("top-border.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(top_border.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(bottom_border) = package.bottom_border {
+            zip.start_file("bottom-border.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(bottom_border.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(portrait_frame) = package.portrait_frame {
+            zip.start_file("portrait-frame.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(portrait_frame.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(plate_frame) = package.plate_frame {
+            zip.start_file("plate-frame.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(plate_frame.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
+        if let Some(accent) = package.accent {
+            zip.start_file("accent.png", options)?;
+            zip.write_all(&*BASE64_STANDARD.decode(accent.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        }
+
         // Stop the HTTP server
-        let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
-        download(&stop_url).await;
+        //let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
+        //download(&stop_url).await;
     }
 
     let char_dat = physis::chardat::CharacterData {
@@ -263,12 +315,15 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     zip.start_file("character.json", options)?;
     zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
 
-    let html = create_html(
-        &char_data
-    );
-
     zip.start_file("character.html", options)?;
-    zip.write_all(html.as_ref())?;
+    zip.write_all(create_character_html(
+        &char_data
+    ).as_ref())?;
+
+    zip.start_file("plate.html", options)?;
+    zip.write_all(create_plate_html(
+        &char_data
+    ).as_ref())?;
 
     zip.finish()?;
 
