@@ -32,6 +32,12 @@ reqwest = { version = "0.12" }
 # Zip the character archive
 zip = { version = "2.2", default-features = false }
 
+# Exporting propietary game data
+physis = { version = "0.3" }
+
+# Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the c lient
+base64 = { version = "0.22", default-features = false }
+
 # Not used directly by us, but to disable the "std" feature and is used by the scraper crate.
 ahash = { version = "0.8.0", default-features = false }
 
@@ -45,9 +51,6 @@ wasm-bindgen-futures = { version = "0.4", default-features = false }
 
 # For async
 tokio = { version = "1.41", features = ["rt", "macros"], default-features = false }
-
-# Encoding the character archive to base64 so the browser can download it
-base64 = { version = "0.22", default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 

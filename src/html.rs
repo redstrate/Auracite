@@ -17,7 +17,7 @@ pub fn create_html(char_data: &CharacterData) -> String {
             world => char_data.world,
             data_center => char_data.data_center,
             race => char_data.appearance.race,
-            subrace => char_data.appearance.subrace,
+            subrace => char_data.appearance.tribe,
             gender => char_data.appearance.gender,
             nameday => char_data.nameday,
             city_state => char_data.city_state

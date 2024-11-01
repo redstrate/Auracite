@@ -4,9 +4,8 @@ pub mod html;
 pub mod parser;
 
 use serde::Deserialize;
-use std::convert::Infallible;
 use std::io::Write;
-use std::sync::{Arc, Mutex};
+use physis::race::{Gender, Race, Subrace};
 use reqwest::Url;
 use zip::result::ZipError;
 use zip::write::SimpleFileOptions;
@@ -14,12 +13,12 @@ use zip::ZipWriter;
 use crate::downloader::download;
 use crate::html::create_html;
 use crate::parser::parse_search;
-#[cfg(target_family = "wasm")]
 use base64::prelude::*;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::JsValue;
+use crate::data::CharacterData;
 
 /// The main Lodestone domain
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
@@ -36,14 +35,46 @@ const IMAGE_TUNNEL_HOST: &str = "img-tunnel.ryne.moe";
 #[derive(Default, Deserialize, Clone)]
 struct Package {
     playtime: String,
-    height: i32,
-    bust_size: i32,
     gil: u32,
     is_battle_mentor: bool,
     is_trade_mentor: bool,
     is_novice: bool,
     is_returner: bool,
     player_commendations: i32,
+    pub portrait: String,
+    pub plate_title: String,
+    pub plate_title_is_prefix: bool,
+    pub plate_class_job: String,
+    pub plate_class_job_level: i32,
+    pub search_comment: String,
+
+    // Appearance
+    pub race: i32,
+    pub gender: i32,
+    pub model_type: i32,
+    pub height: i32,
+    pub tribe: i32,
+    pub face_type: i32,
+    pub hair_style: i32,
+    pub has_highlights: bool,
+    pub skin_color: i32,
+    pub eye_color: i32,
+    pub hair_color: i32,
+    pub hair_color2: i32,
+    pub face_features: i32,
+    pub face_features_color: i32,
+    pub eyebrows: i32,
+    pub eye_color2: i32,
+    pub eye_shape: i32,
+    pub nose_shape: i32,
+    pub jaw_shape: i32,
+    pub lip_style: i32,
+    pub lip_color: i32,
+    pub race_feature_size: i32,
+    pub race_feature_type: i32,
+    pub bust_size: i32,
+    pub facepaint: i32,
+    pub facepaint_color: i32,
 }
 
 #[derive(Debug)]
@@ -153,9 +184,32 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         let package = package.trim_start_matches("\u{feff}");
         let package: Package = serde_json::from_str(&package.trim_start()).unwrap();
 
-        char_data.playtime = package.playtime.parse().unwrap();
+        // appearance data
+        char_data.appearance.model_type = package.model_type;
         char_data.appearance.height = package.height;
+        char_data.appearance.face_type = package.face_type;
+        char_data.appearance.hair_style = package.hair_style;
+        char_data.appearance.has_highlights = package.has_highlights;
+        char_data.appearance.skin_color = package.skin_color;
+        char_data.appearance.eye_color = package.eye_color;
+        char_data.appearance.hair_color = package.hair_color;
+        char_data.appearance.hair_color2 = package.hair_color2;
+        char_data.appearance.face_features = package.face_features;
+        char_data.appearance.face_features_color = package.face_features_color;
+        char_data.appearance.eyebrows = package.eyebrows;
+        char_data.appearance.eye_color2 = package.eye_color2;
+        char_data.appearance.eye_shape = package.eye_color2;
+        char_data.appearance.nose_shape = package.nose_shape;
+        char_data.appearance.jaw_shape = package.jaw_shape;
+        char_data.appearance.lip_style = package.lip_style;
+        char_data.appearance.lip_color = package.lip_color;
+        char_data.appearance.race_feature_size = package.race_feature_size;
+        char_data.appearance.race_feature_type = package.race_feature_type;
         char_data.appearance.bust_size = package.bust_size;
+        char_data.appearance.facepaint = package.facepaint;
+        char_data.appearance.facepaint_color = package.facepaint_color;
+
+        char_data.playtime = package.playtime.parse().unwrap();
         char_data.currencies.gil = package.gil; // TODO: also fetch from the lodestone
         char_data.is_battle_mentor = package.is_battle_mentor;
         char_data.is_trade_mentor = package.is_trade_mentor;
@@ -163,10 +217,48 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         char_data.is_returner = package.is_returner;
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
 
+        zip.start_file("plate-portrait.png", options)?;
+        zip.write_all(&*BASE64_STANDARD.decode(package.portrait.trim_start_matches("data:image/png;base64,")).unwrap())?;
+
         // Stop the HTTP server
         let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
         download(&stop_url).await;
     }
+
+    let char_dat = physis::chardat::CharacterData {
+        version: 0,
+        checksum: 0,
+        race: Race::Hyur,
+        gender: Gender::Male,
+        age: 0,
+        height: 0,
+        subrace: Subrace::Midlander,
+        head: 0,
+        hair: 0,
+        enable_highlights: false,
+        skin_tone: 0,
+        right_eye_color: 0,
+        hair_tone: 0,
+        highlights: 0,
+        facial_features: 0,
+        limbal_eyes: 0,
+        eyebrows: 0,
+        left_eye_color: 0,
+        eyes: 0,
+        nose: 0,
+        jaw: 0,
+        mouth: 0,
+        lips_tone_fur_pattern: 0,
+        tail: 0,
+        face_paint: 0,
+        bust: 0,
+        face_paint_color: 0,
+        voice: 0,
+        timestamp: [0; 4],
+    };
+
+    zip.start_file("FFXIV_CHARA_01.dat", options)?;
+    zip.write_all(&*char_dat.write_to_buffer().unwrap())?;
 
     zip.start_file("character.json", options)?;
     zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;

@@ -70,7 +70,7 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
                     let captures = re.captures(&inner_html).unwrap();
 
                     char_data.appearance.race = captures.get(1).unwrap().as_str().to_owned();
-                    char_data.appearance.subrace = captures.get(2).unwrap().as_str().to_owned();
+                    char_data.appearance.tribe = captures.get(2).unwrap().as_str().to_owned();
                     if captures.get(3).unwrap().as_str() == "♀" {
                         char_data.appearance.gender = "Female".parse().unwrap();
                     } else {
