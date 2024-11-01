@@ -8,6 +8,17 @@ you can display in your browser.
 
 ## Usage
 
+This tool makes several HTTP requests to the Lodestone, but they currently are only a few. The tool does not contact any
+3rd-party external services.
+
+### Web
+
+Auracite can run inside your web browser, accessed at [auracite.xiv.zone](https://auracite.xiv.zone/). It has the same features as the regular version.
+
+### Desktop
+
+A desktop version is available, just run `cargo run`. There is currently no binary distribution available.
+
 ### CLI
 
 Provide a character name via `--name`:
@@ -16,20 +27,13 @@ Provide a character name via `--name`:
 auracite --name "John Doe" 
 ```
 
-The tool will create a new folder with the name "John Doe", which will contain the available data. See the table below
-for the currently supported data that can be recorded. You may want to check out the `character.html` file that can be
-viewed locally in your browser.
-
-This tool makes several HTTP requests to the Lodestone, but they currently are only a few. The tool does not contact any
-3rd-party external services.
+To enable support for the Dalamud plugin, add `--dalamud`.
 
 ### Dalamud Mode
 
 Auracite can only collect so much data from the Lodestone, some data can only be collected when logged in. To do this,
 we provide a Dalamud plugin to run alongside the tool. The plugin is currently available
-[in my personal Dalamud repository](https://github.com/redstrate/DalamudPlugins).
-
-When running the tool, append the `--dalamud` argument. It will walk you through starting the plugin. The plugin can be
+[in my personal Dalamud repository](https://github.com/redstrate/DalamudPlugins). The plugin can be
 safely removed if you're done using Auracite.
 
 ## Supported Data
@@ -44,9 +48,10 @@ safely removed if you're done using Auracite.
 | Guardian                  | ✅         |                                                                                   |
 | Portrait/Full-body Images | ✅         | These are the images displayed on the Lodestone.                                  |
 | Playtime                  | ✅         | Requires the Dalamud plugin.                                                      |
-| Currencies                | 〰️        | Only gil is supported, and requires the Dalamud plugin.                           |
-| Appearance Data           | 〰️        | Only some appearance data, and requires the Dalamud plugin.                       |
-| Misc. state               | 〰️        | Mentor and novice status, also player commendations. Requires the Dalamud plugin. |
+| Currencies                | ⭕️        | Only gil is supported, and requires the Dalamud plugin.                           |
+| Appearance Data           | ✅         | Requires the Dalamud plugin.                                                      |
+| Adventurer Plate          | ✅         | Requires the Dalamud plugin.                                                      |
+| Misc. state               | ⭕️        | Mentor and novice status, also player commendations. Requires the Dalamud plugin. |
 
 Currently, more types of data is planned to be supported in the future.
 
