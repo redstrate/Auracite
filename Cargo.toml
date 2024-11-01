@@ -33,7 +33,7 @@ reqwest = { version = "0.12" }
 zip = { version = "2.2", default-features = false }
 
 # Exporting propietary game data
-physis = { version = "0.3" }
+physis = { git = "https://github.com/redstrate/Physis" }
 
 # Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the c lient
 base64 = { version = "0.22", default-features = false }
