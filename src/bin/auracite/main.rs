@@ -4,18 +4,20 @@ use cxx_kde_frameworks::kcoreaddons::{KAboutData, License};
 use cxx_kde_frameworks::ki18n::{i18n, i18nc, KLocalizedContext, KLocalizedString};
 use cxx_qt_lib::{QByteArray, QGuiApplication, QList, QQmlApplicationEngine, QQuickStyle, QString, QStringList, QUrl};
 use cxx_qt_lib_extras::{QCommandLineOption, QCommandLineParser};
-use auracite::archive_character;
+use auracite::{archive_character, ArchiveError};
 
 pub mod bridge;
 
-fn archive_character_blocking(character_name: &String, use_dalamud: bool) {
+fn archive_character_blocking(character_name: &String, use_dalamud: bool) -> Result<(), ArchiveError> {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
-        .unwrap();
+        .map_err(|_| ArchiveError::UnknownError)?;
 
-    let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud)).unwrap();
-    write("/home/josh/test.zip", inner);
+    let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud))?;
+    write("/home/josh/test.zip", inner)?;
+    
+    Ok(())
 }
 
 fn main() {
