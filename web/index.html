@@ -11,7 +11,6 @@
                 init().then(() => {
                     archive_character_base64(document.getElementById("name").value, document.getElementById("scales").checked).then((uri) => {
                         // Download character archive
-                        window.location.replace(uri);
                         var link = document.createElement('a');
                         link.download = document.getElementById("name").value + ".zip";
                         link.href = uri;
