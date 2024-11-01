@@ -21,7 +21,17 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::JsValue;
 
+/// The main Lodestone domain
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
+
+/// The Lodestone proxy used in WebAssembly builds. Needed for CORS and cookie injection.
+const LODESTONE_TUNNEL_HOST: &str = "https://lodestone-tunnel.ryne.moe";
+
+/// The image domain.
+const IMAGE_HOST: &str = "img2.finalfantasyxiv.com";
+
+/// The image proxy used in WebAssembly builds. Needed for CORS.
+const IMAGE_TUNNEL_HOST: &str = "img-tunnel.ryne.moe";
 
 #[derive(Default, Deserialize, Clone)]
 struct Package {
@@ -66,13 +76,20 @@ impl From<ArchiveError> for JsValue {
             ArchiveError::CharacterNotFound => { JsValue::from_str(&"character_not_found".to_string()) }
             ArchiveError::ParsingError => { JsValue::from_str(&"parsing_error".to_string())}
             ArchiveError::UnknownError => { JsValue::from_str(&"unknown_error".to_string()) }
+            ArchiveError::CouldNotConnectToDalamud => { JsValue::from_str(&"could_not_connect_to_dalamud".to_string()) }
         }
     }
 }
 
 /// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
 pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Result<Vec<u8>, ArchiveError> {
-    let search_url = Url::parse_with_params(&format!("{LODESTONE_HOST}/lodestone/character?"), &[("q", character_name)]).map_err(|_| ArchiveError::UnknownError)?;
+    let lodestone_host = if cfg!(target_family = "wasm") {
+        LODESTONE_TUNNEL_HOST
+    } else {
+        LODESTONE_HOST
+    };
+
+    let search_url = Url::parse_with_params(&format!("{lodestone_host}/lodestone/character?"), &[("q", character_name)]).map_err(|_| ArchiveError::UnknownError)?;
     let search_page = download(&search_url)
         .await
         .map_err(|_| ArchiveError::DownloadFailed(search_url.to_string()))?;
@@ -83,7 +100,7 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         return Err(ArchiveError::CharacterNotFound);
     }
 
-    let char_page_url = Url::parse(&format!("{LODESTONE_HOST}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
+    let char_page_url = Url::parse(&format!("{lodestone_host}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
     let char_page = download(&char_page_url)
         .await
         .map_err(|_| ArchiveError::DownloadFailed(char_page_url.to_string()))?;
@@ -92,13 +109,17 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     let mut char_data = parser::parse_lodestone(&char_page);
 
     // 2 MiB, for one JSON and two images
-    let mut buf = vec![0; 2097152];
-    let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf[..]));
+    let mut buf = Vec::new();
+    let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf));
 
     let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Stored);
 
     if !char_data.portrait_url.is_empty() {
-        let portrait_url = char_data.portrait_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+        let portrait_url = if cfg!(target_family = "wasm") {
+            &char_data.portrait_url.replace(IMAGE_HOST, IMAGE_TUNNEL_HOST)
+        } else {
+            &char_data.portrait_url
+        };
         let portrait_url = Url::parse(&portrait_url).map_err(|_| ArchiveError::UnknownError)?;
 
         let portrait = download(&portrait_url)
@@ -109,7 +130,11 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         zip.write_all(&*portrait)?;
     }
     if !char_data.face_url.is_empty() {
-        let face_url = char_data.face_url.replace("img2.finalfantasyxiv.com", "img-tunnel.ryne.moe");
+        let face_url = if cfg!(target_family = "wasm") {
+            &char_data.face_url.replace(IMAGE_HOST, IMAGE_TUNNEL_HOST)
+        } else {
+            &char_data.face_url
+        };
         let face_url = Url::parse(&face_url).map_err(|_| ArchiveError::UnknownError)?;
 
         let face = download(&face_url)
@@ -137,6 +162,10 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         char_data.is_novice = package.is_novice;
         char_data.is_returner = package.is_returner;
         char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
+
+        // Stop the HTTP server
+        let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
+        download(&stop_url).await;
     }
 
     zip.start_file("character.json", options)?;

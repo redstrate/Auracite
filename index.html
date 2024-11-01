@@ -10,7 +10,7 @@
 
     function archive() {
         init().then(() => {
-            archive_character_base64(document.getElementById("name").value, false).then((uri) => {
+            archive_character_base64(document.getElementById("name").value, document.getElementById("scales").checked).then((uri) => {
                 // Download character archive
                 window.location.replace(uri);
                 document.getElementById("statusMessage").innerText = "Archive complete!";

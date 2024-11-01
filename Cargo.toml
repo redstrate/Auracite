@@ -12,7 +12,8 @@ cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", featur
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-scraper = { version ="0.21", default-features = false }
+# NOTE: Do not upgrade to 0.21, as it crashes in WebAssembly for some reason. Report this upstream.
+scraper = { version ="0.20" }
 
 # Used to serialize the JSON data we export
 serde = { version = "1.0", features = ["derive"], default-features = false }

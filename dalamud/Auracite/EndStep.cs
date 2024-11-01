@@ -44,10 +44,17 @@ public class EndStep : IStep
         [Route(HttpVerbs.Get, "/package")]
         public void GetPackage()
         {
+            Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin,  "*");
             Response.ContentType = MimeType.Json;
             using var writer = HttpContext.OpenResponseText(Encoding.UTF8, true);
             writer.Write(JsonConvert.SerializeObject(Plugin.package));
-            
+        }
+        
+        // TODO: Make this a POST request?
+        // This is needed since we don't know when the CORS handshake really stops. This really shouldn't be needed though.
+        [Route(HttpVerbs.Get, "/stop")]
+        public void Stop()
+        {
             _endStep.End();
         }
     }
@@ -61,7 +68,6 @@ public class EndStep : IStep
         _server = new WebServer(o => o
                 .WithUrlPrefix("http://localhost:42072/")
                 .WithMode(HttpListenerMode.EmbedIO))
-            .WithCors("http://localhost:42072/")
             .WithWebApi("/", m => m.WithController(() => new Controller(this)));
         _server.RunAsync();
     }
