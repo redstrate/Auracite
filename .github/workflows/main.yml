@@ -38,13 +38,19 @@ jobs:
           sudo apt-get install \
             gettext \
             gperf \
-            libwayland-dev \
+            libwayland-dev
       - name: Set reusable strings
         id: strings
         shell: bash
         run: |
           echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
           echo "prefix-dir=${{ github.workspace }}/prefix" >> "$GITHUB_OUTPUT"
+      - name: Cache Prefix
+        id: cache-prefix-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ steps.strings.outputs.prefix-dir }}
+          key: ${{ runner.os }}-prefix
       - name: Build Extra CMake Modules
         if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
         run: |
@@ -67,7 +73,17 @@ jobs:
           git clone https://invent.kde.org/frameworks/kcoreaddons.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-kca -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S kcoreaddons -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
           cmake --build ${{ steps.strings.outputs.build-output-dir }}-kca --target install
+      - name: Save Prefix
+        id: cache-prefix-save
+        uses: actions/cache/save@v4
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        with:
+          path: ${{ steps.strings.outputs.prefix-dir }}
+          key: ${{ steps.cache-prefix-restore.outputs.cache-primary-key }}
       - name: Build
-        run: KDE_INCLUDEDIR=${{ steps.strings.outputs.prefix-dir }}/include KDE_LIBDIR=${{ steps.strings.outputs.prefix-dir }}/lib64 cargo build --verbose
+        run: |
+          export KDE_INCLUDEDIR=${{ steps.strings.outputs.prefix-dir }}/include
+          export KDE_LIBDIR=${{ steps.strings.outputs.prefix-dir }}/lib64
+          cargo build --verbose
       - name: Run clippy
         run: cargo clippy
