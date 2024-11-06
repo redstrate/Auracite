@@ -82,8 +82,8 @@ jobs:
           key: ${{ steps.cache-prefix-restore.outputs.cache-primary-key }}
       - name: Build
         run: |
-          export KDE_INCLUDEDIR=${{ github.workspace }}/prefix/include
-          export KDE_LIBDIR=${{ github.workspace }}/prefix/lib64
+          export KDE_INCLUDEDIR=${{ github.workspace }}/../prefix/include
+          export KDE_LIBDIR=${{ github.workspace }}/../prefix/lib64
           cargo build --verbose
       - name: Run clippy
         run: cargo clippy
