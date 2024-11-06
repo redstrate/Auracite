@@ -32,6 +32,13 @@ jobs:
           version: "${{ env.QT_VERSION }}.*"
           cache: true
           modules: 'qtshadertools'
+      - name: Setup Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+            gettext \
+            gperf \
+            libwayland-dev \
       - name: Set reusable strings
         id: strings
         shell: bash
