@@ -32,14 +32,35 @@ jobs:
           version: "${{ env.QT_VERSION }}.*"
           cache: true
           modules: 'qtshadertools'
-      - name: Setup Linux dependencies
+      - name: Set reusable strings
+        id: strings
+        shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install \
-            libkf6coreaddons-dev \
-            libkf6i18n-dev \
-            libkf6crash-dev
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+          echo "prefix-dir=${{ github.workspace }}/prefix" >> "$GITHUB_OUTPUT"
+      - name: Build Extra CMake Modules
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        run: |
+          git clone https://invent.kde.org/frameworks/extra-cmake-modules.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-ECM -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S extra-cmake-modules -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-ECM --target install
+          cmake --install ${{ steps.strings.outputs.build-output-dir }}-ECM
+      - name: Configure KI18n
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        run: |
+          git clone https://invent.kde.org/frameworks/ki18n.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-ki18n -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S ki18n -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+      - name: Build KI18n
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        run: |
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-ki18n --target install
+      - name: Build KCoreAddons
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        run: |
+          git clone https://invent.kde.org/frameworks/kcoreaddons.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-kca -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S kcoreaddons -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-kca --target install
       - name: Build
-        run: cargo build --verbose
+        run: KDE_INCLUDEDIR=${{ steps.strings.outputs.prefix-dir }}/include KDE_LIBDIR=${{ steps.strings.outputs.prefix-dir }}/lib64 cargo build --verbose
       - name: Run clippy
         run: cargo clippy
