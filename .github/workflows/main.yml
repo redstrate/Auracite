@@ -32,6 +32,13 @@ jobs:
           version: "${{ env.QT_VERSION }}.*"
           cache: true
           modules: 'qtshadertools'
+      - name: Setup Linux dependencies
+        run: |
+          sudo apt-get update \
+          sudo apt-get install \
+            libkf6coreaddons-dev \
+            libkf6i18n-dev \
+            libkf6crash-dev
       - name: Build
         run: cargo build --verbose
       - name: Run clippy
