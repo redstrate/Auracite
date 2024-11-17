@@ -7,7 +7,7 @@ using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using Lumina.Data.Files;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
@@ -135,9 +135,9 @@ public class AdventurerPlateStep : IStep
                         .ToBase64String(PngFormat.Instance);
                 }
 
-                Plugin.package.plate_title = Title?.Feminine; // TODO: Support mascs
+                Plugin.package.plate_title = Title?.Feminine.ToString(); // TODO: Support mascs
                 Plugin.package.plate_title_is_prefix = Title?.IsPrefix;
-                Plugin.package.plate_class_job = ClassJob?.Name;
+                Plugin.package.plate_class_job = ClassJob?.Name.ToString();
                 Plugin.package.plate_class_job_level = AgentCharaCard.Instance()->Data->Level;
                 Plugin.package.search_comment = AgentCharaCard.Instance()->Data->SearchComment.ToString();
                 Completed?.Invoke();
@@ -223,24 +223,24 @@ public class AdventurerPlateStep : IStep
     public string ResolveCardBase(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardBase>()?.GetRow(rowIndex);
-        return $"ui/icon/{row.Image.ToString().Substring(0, 3)}000/{row.Image}_hr1.tex";
+        return $"ui/icon/{row?.Image.ToString().Substring(0, 3)}000/{row?.Image}_hr1.tex";
     }
     
     public string? ResolveCardDecoration(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardDecoration>()?.GetRow(rowIndex);
-        return $"ui/icon/{row.Image.ToString().Substring(0, 3)}000/{row.Image}_hr1.tex";
+        return $"ui/icon/{row?.Image.ToString().Substring(0, 3)}000/{row?.Image}_hr1.tex";
     }
     
     public string? ResolveCardHeaderTop(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardHeader>()?.GetRow(rowIndex);
-        return $"ui/icon/{row.TopImage.ToString().Substring(0, 3)}000/{row.TopImage}_hr1.tex";
+        return $"ui/icon/{row?.TopImage.ToString().Substring(0, 3)}000/{row?.TopImage}_hr1.tex";
     }
     
     public string? ResolveCardHeaderBottom(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardHeader>()?.GetRow(rowIndex);
-        return $"ui/icon/{row.BottomImage.ToString().Substring(0, 3)}000/{row.BottomImage}_hr1.tex";
+        return $"ui/icon/{row?.BottomImage.ToString().Substring(0, 3)}000/{row?.BottomImage}_hr1.tex";
     }
 }
