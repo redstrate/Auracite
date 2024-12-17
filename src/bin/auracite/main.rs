@@ -8,14 +8,14 @@ use auracite::{archive_character, ArchiveError};
 
 pub mod bridge;
 
-fn archive_character_blocking(character_name: &String, use_dalamud: bool) -> Result<(), ArchiveError> {
+fn archive_character_blocking(character_name: &String, use_dalamud: bool, filename: &String) -> Result<(), ArchiveError> {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
         .map_err(|_| ArchiveError::UnknownError)?;
 
     let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud))?;
-    write("/home/josh/test.zip", inner)?;
+    write(filename, inner)?;
     
     Ok(())
 }
@@ -70,7 +70,7 @@ fn main() {
 
         println!("Downloading character data for {}...", character_name);
 
-        archive_character_blocking(&character_name, command_line_parser.is_set(&QString::from("dalamud")));
+        archive_character_blocking(&character_name, command_line_parser.is_set(&QString::from("dalamud")), &format!("{}.zip", character_name));
 
         return;
     }

@@ -22,7 +22,7 @@ pub mod bridge {
     unsafe extern "RustQt" {
         #[qinvokable]
         #[cxx_name = "archiveCharacter"]
-        fn archive_character(self: Pin<&mut Backend>, character_name: &QString, use_dalamud: bool);
+        fn archive_character(self: Pin<&mut Backend>, character_name: &QString, use_dalamud: bool, filename: &QString);
     }
 }
 
@@ -37,8 +37,8 @@ pub struct BackendRust {
 }
 
 impl bridge::Backend {
-    pub fn archive_character(mut self: Pin<&mut Self>, character_name: &QString, use_dalamud: bool) {
-        match archive_character_blocking(&character_name.to_string(), use_dalamud) {
+    pub fn archive_character(mut self: Pin<&mut Self>, character_name: &QString, use_dalamud: bool, filename: &QString) {
+        match archive_character_blocking(&character_name.to_string(), use_dalamud, &filename.to_string()) {
             Ok(_) => { self.archive_successful() }
             Err(err) => {
                 match err {
