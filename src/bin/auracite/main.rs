@@ -28,13 +28,12 @@ fn main() {
     KLocalizedString::set_application_domain(&QByteArray::from("auracite"));
 
     let mut about_data = KAboutData::from(
-        QString::from("auracite"),
+        QString::from("zone.xiv.auracite"),
         i18nc("@title", "Auracite"),
         QString::from(option_env!("CARGO_PKG_VERSION").unwrap()),
         i18nc("@title", "Export your FFXIV character in portable, generic formats."),
         License::GPL_V3,
     );
-
 
     let Some(mut about_data) = about_data.as_mut() else {
         return;

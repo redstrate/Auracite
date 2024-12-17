@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Auracite
+Exec=auracite %u
+Terminal=false
+Icon=zone.xiv.auracite
+Type=Application
+SingleMainWindow=true

@@ -1,0 +1,59 @@
+{
+  "id": "zone.xiv.auracite",
+  "branch": "master",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "6.7",
+  "sdk": "org.kde.Sdk",
+  "command": "auracite",
+  "finish-args": [
+    "--device=dri",
+    "--env=QML_IMPORT_PATH=/app/qml",
+    "--env=QT_PLUGIN_PATH=/app/plugins:/app/lib64/plugins:/app/lib/plugins:/usr/share/runtime/lib/plugins",
+    "--share=network",
+    "--socket=fallback-x11",
+    "--socket=wayland"
+  ],
+  "sdk-extensions": [
+    "org.freedesktop.Sdk.Extension.rust-stable"
+  ],
+  "build-options": {
+    "append-path" : "/usr/lib/sdk/rust-stable/bin",
+    "env" : {
+      "CARGO_HOME" : "/run/build/auracite/cargo"
+    }
+  },
+  "modules": [
+    {
+      "name": "kirigami-addons",
+      "config-opts": [
+        "-DBUILD_TESTING=OFF",
+        "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+      ],
+      "buildsystem": "cmake-ninja",
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://invent.kde.org/libraries/kirigami-addons.git"
+        }
+      ]
+    },
+    {
+      "name": "auracite",
+      "buildsystem": "simple",
+      "build-commands": [
+        "cargo --offline fetch --manifest-path Cargo.toml",
+        "cargo --offline build --release",
+        "install -Dm755 ./target/release/auracite -t /app/bin/",
+        "install -Dm644 ./zone.xiv.auracite.svg -t /app/share/icons/hicolor/scalable/apps/",
+        "install -Dm644 ./zone.xiv.auracite.desktop -t /app/share/applications/"
+      ],
+      "sources": [
+        {
+          "type": "dir",
+          "path": "."
+        },
+        "generated-sources.json"
+      ]
+    }
+  ]
+}
