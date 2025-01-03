@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.Graphics.Kernel;
@@ -19,22 +20,50 @@ namespace Auracite;
 
 public class AdventurerPlateStep : IStep
 {
-    // Won't be needed once https://github.com/aers/FFXIVClientStructs/pull/1139 is merged
+    public enum DecorationType
+    {
+        Invald = 0x0,
+        Backing = 0x1,
+        PatternOverlay = 0x2,
+        PortraitFrame = 0x3,
+        PlateFrame = 0x4,
+        Accent = 0x5,
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x8)]
+    public unsafe struct DecorationSet
+    {
+        [FieldOffset(0x0)] public DecorationType Type;
+    }
+
+    [System.Runtime.InteropServices.StructLayoutAttribute(LayoutKind.Sequential, Pack = 1)]
+    [InlineArray(5)]
+    public struct FixedSizeArray5<T> where T : unmanaged
+    {
+        private T _element0;
+    }
+
+    // Currently upstreaming via: https://github.com/aers/FFXIVClientStructs/pull/1269
     [StructLayout(LayoutKind.Explicit, Size = 0x9B0)]
-    public unsafe struct CustomStorage {
+    public unsafe struct CustomStorage
+    {
+        /// True if the player has the "Edit Plate" window open.
+        [FieldOffset(0x2)] public bool Editing;
         [FieldOffset(0x4)] public uint EntityId;
         [FieldOffset(0x8)] public ulong ContentId;
         
         [FieldOffset(0x1B)] public bool InvertPortraitPlacement;
         [FieldOffset(0x1C)] public byte BasePlate;
-        [FieldOffset(0x22)] public byte Backing;
         [FieldOffset(0x1E)] public byte TopBorder;
         [FieldOffset(0x1F)] public byte BottomBorder;
-        [FieldOffset(0x24)] public byte PatternOverlay;
-        [FieldOffset(0x26)] public byte PortraitFrame;
-        [FieldOffset(0x28)] public byte PlateFrame;
-        [FieldOffset(0x2A)] public byte Accent;
-
+        
+        /// The number of decorations.
+        /// This is any Pattern Overlay, Backing, Portrait Frame, Plate Frame and Accents.
+        [FieldOffset(0x20)] public ushort NumDecorations;
+        
+        /// The size of this array is NumDecorations.
+        [FieldOffset(0x22)] public FixedSizeArray5<ushort> DecorationRowIndices;
+        
         [FieldOffset(0x60)] public Utf8String Name;
         [FieldOffset(0xC8)] public ushort WorldId;
         [FieldOffset(0xCA)] public byte ClassJobId;
@@ -62,6 +91,10 @@ public class AdventurerPlateStep : IStep
         [FieldOffset(0x490)] public Utf8String Activity6Name;
 
         [FieldOffset(0x540)] public CharaViewPortrait CharaView;
+
+        /// The size of this array is NumDecorations.
+        [FieldOffset(0x22C)] public FixedSizeArray5<DecorationSet> Decorations;
+
         [FieldOffset(0x960)] public Texture* PortraitTexture;
     }
     
@@ -93,16 +126,48 @@ public class AdventurerPlateStep : IStep
                         .ToBase64String(PngFormat.Instance);
                 }
 
-                if (customData->PatternOverlay != 0)
+                for (int i = 0; i < customData->NumDecorations; i++)
                 {
-                    Plugin.package.pattern_overlay = GetImage(ResolveCardDecoration(customData->PatternOverlay))
-                        .ToBase64String(PngFormat.Instance);
-                }
-
-                if (customData->Backing != 0)
-                {
-                    Plugin.package.backing = GetImage(ResolveCardDecoration(customData->Backing))
-                        .ToBase64String(PngFormat.Instance);
+                    var decoration = customData->Decorations[i];
+                    var rowIndex = customData->DecorationRowIndices[i];
+                    if (rowIndex == 0)
+                    {
+                        continue;
+                    }
+                    
+                    switch (decoration.Type)
+                    {
+                        case DecorationType.PatternOverlay:
+                        {
+                            Plugin.package.pattern_overlay = GetImage(ResolveCardDecoration(rowIndex))
+                                .ToBase64String(PngFormat.Instance);
+                        }
+                            break;
+                        case DecorationType.Backing:
+                        {
+                            Plugin.package.backing = GetImage(ResolveCardDecoration(rowIndex))
+                                .ToBase64String(PngFormat.Instance);
+                        }
+                            break;
+                        case DecorationType.PortraitFrame:
+                        {
+                            Plugin.package.portrait_frame = GetImage(ResolveCardDecoration(rowIndex))
+                                .ToBase64String(PngFormat.Instance);
+                        }
+                            break;
+                        case DecorationType.PlateFrame:
+                        {
+                            Plugin.package.plate_frame = GetImage(ResolveCardDecoration(rowIndex))
+                                .ToBase64String(PngFormat.Instance);
+                        }
+                            break;
+                        case DecorationType.Accent:
+                        {
+                            Plugin.package.accent = GetImage(ResolveCardDecoration(rowIndex))
+                                .ToBase64String(PngFormat.Instance);
+                        }
+                            break;
+                    }
                 }
 
                 if (customData->TopBorder != 0)
@@ -114,24 +179,6 @@ public class AdventurerPlateStep : IStep
                 if (customData->BottomBorder != 0)
                 {
                     Plugin.package.bottom_border = GetImage(ResolveCardHeaderBottom(customData->BottomBorder))
-                        .ToBase64String(PngFormat.Instance);
-                }
-
-                if (customData->PortraitFrame != 0)
-                {
-                    Plugin.package.portrait_frame = GetImage(ResolveCardDecoration(customData->PortraitFrame))
-                        .ToBase64String(PngFormat.Instance);
-                }
-
-                if (customData->PlateFrame != 0)
-                {
-                    Plugin.package.plate_frame = GetImage(ResolveCardDecoration(customData->PlateFrame))
-                        .ToBase64String(PngFormat.Instance);
-                }
-
-                if (customData->Accent != 0)
-                {
-                    Plugin.package.accent = GetImage(ResolveCardDecoration(customData->Accent))
                         .ToBase64String(PngFormat.Instance);
                 }
 
