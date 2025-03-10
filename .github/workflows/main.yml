@@ -83,8 +83,8 @@ jobs:
       - name: Build
         run: |
           export KDE_INCLUDEDIR=${{ github.workspace }}/prefix/include
-          export KDE_LIBDIR=${{ github.workspace }}/prefix/lib64
-          export CMAKE_PREFIX_PATH=${{ github.workspace }}/prefix/lib64/cmake
+          export KDE_LIBDIR=${{ github.workspace }}/prefix/lib/x86_64-linux-gnu
+          export CMAKE_PREFIX_PATH=${{ github.workspace }}/prefix/lib/x86_64-linux-gnu/cmake
           cargo build --verbose
       - name: Run clippy
         run: cargo clippy
