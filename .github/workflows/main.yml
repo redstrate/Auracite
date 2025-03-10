@@ -9,6 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   QT_VERSION: 6.6
+  KF_VERSION: 6.8
 
 jobs:
   build:
@@ -70,13 +71,13 @@ jobs:
       - name: Build KCoreAddons
         if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
         run: |
-          git clone https://invent.kde.org/frameworks/kcoreaddons.git
+          git clone --depth 1 --branch ${{ env.KF_VERSION }} https://invent.kde.org/frameworks/kcoreaddons.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-kca -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S kcoreaddons -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
           cmake --build ${{ steps.strings.outputs.build-output-dir }}-kca --target install
       - name: Build KCrash
         if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
         run: |
-          git clone https://invent.kde.org/frameworks/kcrash.git
+          git clone --depth 1 --branch ${{ env.KF_VERSION }} https://invent.kde.org/frameworks/kcrash.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-kcrash -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S kcrash -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
           cmake --build ${{ steps.strings.outputs.build-output-dir }}-kcrash --target install
       - name: Build KConfig
