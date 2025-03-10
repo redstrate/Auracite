@@ -17,7 +17,8 @@ cxx-qt-build = { version = "0.7", features = ["link_qt_object_files"], default-f
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-scraper = { version ="0.20" }
+# NOTE: Do not upgrade to 0.21, as it crashes in WebAssembly for some reason. Report this upstream.
+scraper = { version = "0.20" }
 
 # Used to serialize the JSON data we export
 serde = { version = "1.0", features = ["derive"], default-features = false }
