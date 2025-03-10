@@ -9,7 +9,7 @@ on:
 env:
   CARGO_TERM_COLOR: always
   QT_VERSION: 6.6
-  KF_VERSION: 6.8
+  KF_VERSION: v6.11.0
 
 jobs:
   build:
@@ -62,7 +62,7 @@ jobs:
       - name: Configure KI18n
         if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
         run: |
-          git clone https://invent.kde.org/frameworks/ki18n.git
+          git clone --depth 1 --branch ${{ env.KF_VERSION }} https://invent.kde.org/frameworks/ki18n.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-ki18n -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }} -S ki18n -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
       - name: Build KI18n
         if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
