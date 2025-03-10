@@ -1,7 +1,7 @@
 [package]
 name = "auracite"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 description = "Export your FFXIV character in portable, generic formats"
 repository = "https://github.com/redstrate/Auracite"
 license = "AGPL-3"
@@ -9,12 +9,14 @@ license = "AGPL-3"
 [lib]
 crate-type = ["cdylib", "rlib"]
 
+[features]
+debug = ["dep:console_error_panic_hook"]
+
 [build-dependencies]
-cxx-qt-build = { git = "https://github.com/KDAB/cxx-qt", branch = "main", features = ["link_qt_object_files"], default-features = false }
+cxx-qt-build = { version = "0.7", features = ["link_qt_object_files"], default-features = false }
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-# NOTE: Do not upgrade to 0.21, as it crashes in WebAssembly for some reason. Report this upstream.
 scraper = { version ="0.20" }
 
 # Used to serialize the JSON data we export
@@ -24,7 +26,7 @@ serde = { version = "1.0", features = ["derive"], default-features = false }
 regex = { version = "1.11", default-features = false, features = ["unicode-perl"] }
 
 # Used to generate the HTML page to easily preview your exported data
-minijinja = { version = "2.0", default-features = false }
+minijinja = { version = "2.8", default-features = false }
 
 # Download files
 reqwest = { version = "0.12" }
@@ -39,30 +41,32 @@ physis = { git = "https://github.com/redstrate/Physis" }
 base64 = { version = "0.22", default-features = false }
 
 # Not used directly by us, but to disable the "std" feature and is used by the scraper crate.
-ahash = { version = "0.8.0", default-features = false }
+ahash = { version = "0.8.1", default-features = false }
 
 # Ditto, but used by the ahash crate.
 getrandom = { version = "0.2", features = ["js"], default-features = false }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 # Used to generate the WebAssembly version
-wasm-bindgen = { version = "0.2.95", default-features = false }
+wasm-bindgen = { version = "0.2", default-features = false }
 wasm-bindgen-futures = { version = "0.4", default-features = false }
 
 # For async
-tokio = { version = "1.41", features = ["rt", "macros"], default-features = false }
+tokio = { version = "1.44", features = ["rt", "macros"], default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
+console_error_panic_hook = { version = "0.1.7", optional = true }
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # For async
-tokio = { version = "1.41", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
+tokio = { version = "1.44", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
 
 # Used for the Qt UI
 cxx = { version = "1.0", default-features = false }
-cxx-qt = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
-cxx-qt-lib = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
-cxx-qt-lib-extras = { git = "https://github.com/KDAB/cxx-qt", branch = "main", default-features = false }
-cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "work/redstrate/kaboutdata-process-cmdline", default-features = false }
+cxx-qt = { version = "0.7", default-features = false }
+cxx-qt-lib = { version = "0.7", default-features = false }
+cxx-qt-lib-extras = { version = "0.7", default-features = false }
+cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "master", default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }

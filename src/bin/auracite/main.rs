@@ -1,6 +1,6 @@
 use std::env::args;
 use std::fs::write;
-use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAuthor, License};
+use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAboutPerson, License};
 use cxx_kde_frameworks::ki18n::{i18n, i18nc, KLocalizedContext, KLocalizedString};
 use cxx_qt_lib::{QByteArray, QGuiApplication, QList, QQmlApplicationEngine, QQuickStyle, QString, QStringList, QUrl};
 use cxx_qt_lib_extras::{QCommandLineOption, QCommandLineParser};
@@ -39,13 +39,13 @@ fn main() {
         return;
     };
 
-    about_data.as_mut().add_author(KAuthor {
-        name: i18n("Joshua Goins"),
-        task: i18n("Maintainer"),
-        email_address: QString::from("josh@redstrate.com"),
-        web_address: QString::from("https://redstrate.com"),
-        avatar_url: QUrl::from(&QString::from("https://redstrate.com/rss-image.png")),
-    });
+    about_data.as_mut().add_author(&KAboutPerson::from(
+        &i18n("Joshua Goins"),
+        &i18n("Maintainer"),
+        &QString::from("josh@redstrate.com"),
+        &QString::from("https://redstrate.com"),
+        &QUrl::from(&QString::from("https://redstrate.com/rss-image.png"))
+    ));
 
     KAboutData::set_application_data(&*about_data);
 

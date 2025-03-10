@@ -29,6 +29,20 @@ auracite --name "John Doe"
 
 To enable support for the Dalamud plugin, add `--dalamud`.
 
+## Building
+
+### Desktop
+
+To run the desktop client, simply run `cargo run`. You must have Qt6 development packages installed beforehand.
+
+### Flatpak
+
+To build the Flatpak, use `flatpak-builder` or the helper script `scripts/build-flatpak.sh`. An `auracite.flatpak` file will be generated.
+
+### Web
+
+To build the Web version, use `wasm-pack` or the helper script `scripts/build-web.sh`. A folder called `pkg/` will be generated, and the HTML files live in `web/`.
+
 ### Dalamud Mode
 
 Auracite can only collect so much data from the Lodestone, some data can only be collected when logged in. To do this,
