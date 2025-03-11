@@ -20,6 +20,7 @@ namespace Auracite;
 
 public class AdventurerPlateStep : IStep
 {
+    // Remove when https://github.com/aers/FFXIVClientStructs/pull/1319 is merged
     enum DecorationType
     {
         Invalid = 0x0,
