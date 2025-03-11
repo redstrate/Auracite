@@ -20,9 +20,9 @@ namespace Auracite;
 
 public class AdventurerPlateStep : IStep
 {
-    public enum DecorationType
+    enum DecorationType
     {
-        Invald = 0x0,
+        Invalid = 0x0,
         Backing = 0x1,
         PatternOverlay = 0x2,
         PortraitFrame = 0x3,
@@ -30,74 +30,6 @@ public class AdventurerPlateStep : IStep
         Accent = 0x5,
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 0x8)]
-    public unsafe struct DecorationSet
-    {
-        [FieldOffset(0x0)] public DecorationType Type;
-    }
-
-    [System.Runtime.InteropServices.StructLayoutAttribute(LayoutKind.Sequential, Pack = 1)]
-    [InlineArray(5)]
-    public struct FixedSizeArray5<T> where T : unmanaged
-    {
-        private T _element0;
-    }
-
-    // Currently upstreaming via: https://github.com/aers/FFXIVClientStructs/pull/1269
-    [StructLayout(LayoutKind.Explicit, Size = 0x9B0)]
-    public unsafe struct CustomStorage
-    {
-        /// True if the player has the "Edit Plate" window open.
-        [FieldOffset(0x2)] public bool Editing;
-        [FieldOffset(0x4)] public uint EntityId;
-        [FieldOffset(0x8)] public ulong ContentId;
-        
-        [FieldOffset(0x1B)] public bool InvertPortraitPlacement;
-        [FieldOffset(0x1C)] public byte BasePlate;
-        [FieldOffset(0x1E)] public byte TopBorder;
-        [FieldOffset(0x1F)] public byte BottomBorder;
-        
-        /// The number of decorations.
-        /// This is any Pattern Overlay, Backing, Portrait Frame, Plate Frame and Accents.
-        [FieldOffset(0x20)] public ushort NumDecorations;
-        
-        /// The size of this array is NumDecorations.
-        [FieldOffset(0x22)] public FixedSizeArray5<ushort> DecorationRowIndices;
-        
-        [FieldOffset(0x60)] public Utf8String Name;
-        [FieldOffset(0xC8)] public ushort WorldId;
-        [FieldOffset(0xCA)] public byte ClassJobId;
-
-        [FieldOffset(0xCC)] public byte GcRank;
-
-        [FieldOffset(0xD0)] public ushort Level;
-        [FieldOffset(0xD2)] public ushort TitleId;
-
-        [FieldOffset(0xE0)] public Utf8String FreeCompany;
-        [FieldOffset(0x148)] public Utf8String SearchComment;
-        [FieldOffset(0x1B0)] public Utf8String SearchCommentRaw; // contains unresolved AutoTranslatePayloads
-
-        [FieldOffset(0x258)] public uint Activity1IconId;
-        [FieldOffset(0x260)] public Utf8String Activity1Name;
-        [FieldOffset(0x2C8)] public uint Activity2IconId;
-        [FieldOffset(0x2D0)] public Utf8String Activity2Name;
-        [FieldOffset(0x338)] public uint Activity3IconId;
-        [FieldOffset(0x340)] public Utf8String Activity3Name;
-        [FieldOffset(0x3A8)] public uint Activity4IconId;
-        [FieldOffset(0x3B0)] public Utf8String Activity4Name;
-        [FieldOffset(0x418)] public uint Activity5IconId;
-        [FieldOffset(0x420)] public Utf8String Activity5Name;
-        [FieldOffset(0x488)] public uint Activity6IconId;
-        [FieldOffset(0x490)] public Utf8String Activity6Name;
-
-        [FieldOffset(0x540)] public CharaViewPortrait CharaView;
-
-        /// The size of this array is NumDecorations.
-        [FieldOffset(0x22C)] public FixedSizeArray5<DecorationSet> Decorations;
-
-        [FieldOffset(0x960)] public Texture* PortraitTexture;
-    }
-    
     public AdventurerPlateStep()
     {
         
@@ -116,26 +48,28 @@ public class AdventurerPlateStep : IStep
         {
             unsafe
             {
-                var customData = (CustomStorage*)AgentCharaCard.Instance()->Data;
+                var storage = AgentCharaCard.Instance()->Data;
                 var image = GetCurrentCharaViewImage();
                 Plugin.package.portrait = image.ToBase64String(PngFormat.Instance);
+
+                var plateDesign = storage->PlateDesign;
                 
-                if (customData->BasePlate != 0)
+                if (plateDesign.BasePlate != 0)
                 {
-                    Plugin.package.base_plate = GetImage(ResolveCardBase(customData->BasePlate))
+                    Plugin.package.base_plate = GetImage(ResolveCardBase(plateDesign.BasePlate))
                         .ToBase64String(PngFormat.Instance);
                 }
 
-                for (int i = 0; i < customData->NumDecorations; i++)
+                for (int i = 0; i < plateDesign.NumDecorations; i++)
                 {
-                    var decoration = customData->Decorations[i];
-                    var rowIndex = customData->DecorationRowIndices[i];
+                    var decoration = storage->Decorations[i];
+                    var rowIndex = plateDesign.Decorations[i];
                     if (rowIndex == 0)
                     {
                         continue;
                     }
                     
-                    switch (decoration.Type)
+                    switch ((DecorationType)decoration.Index)
                     {
                         case DecorationType.PatternOverlay:
                         {
@@ -170,15 +104,15 @@ public class AdventurerPlateStep : IStep
                     }
                 }
 
-                if (customData->TopBorder != 0)
+                if (plateDesign.TopBorder != 0)
                 {
-                    Plugin.package.top_border = GetImage(ResolveCardHeaderTop(customData->TopBorder))
+                    Plugin.package.top_border = GetImage(ResolveCardHeaderTop(plateDesign.TopBorder))
                         .ToBase64String(PngFormat.Instance);
                 }
 
-                if (customData->BottomBorder != 0)
+                if (plateDesign.BottomBorder != 0)
                 {
-                    Plugin.package.bottom_border = GetImage(ResolveCardHeaderBottom(customData->BottomBorder))
+                    Plugin.package.bottom_border = GetImage(ResolveCardHeaderBottom(plateDesign.BottomBorder))
                         .ToBase64String(PngFormat.Instance);
                 }
 
