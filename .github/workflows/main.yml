@@ -128,6 +128,20 @@ jobs:
           git clone --depth 1 --branch ${{ env.KF_VERSION }}  https://invent.kde.org/frameworks/kiconthemes.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-kiconthemes -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }}  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S kiconthemes -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
           cmake --build ${{ steps.strings.outputs.build-output-dir }}-kiconthemes  --target install
+      - name: Build KCodecs
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: |
+          git clone --depth 1 --branch ${{ env.KF_VERSION }}  https://invent.kde.org/frameworks/kcodecs.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-kcodecs -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }}  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S kcodecs -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-kcodecs  --target install
+      - name: Build KConfigWidgets
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: |
+          git clone --depth 1 --branch ${{ env.KF_VERSION }}  https://invent.kde.org/frameworks/kconfigwidgets.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-kconfigwidgets -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }}  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S kconfigwidgets -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-kconfigwidgets  --target install
       - name: Save Prefix
         id: cache-prefix-save
         uses: actions/cache/save@v4
