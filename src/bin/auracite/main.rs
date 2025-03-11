@@ -30,7 +30,7 @@ fn main() {
     let mut about_data = KAboutData::from(
         QString::from("zone.xiv.auracite"),
         i18nc("@title", "Auracite"),
-        QString::from(option_env!("CARGO_PKG_VERSION").unwrap()),
+        QString::from(env!("CARGO_PKG_VERSION")),
         i18nc("@title", "Export your FFXIV character in portable, generic formats."),
         License::GPL_V3,
     );
