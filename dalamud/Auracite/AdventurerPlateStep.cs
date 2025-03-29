@@ -20,17 +20,6 @@ namespace Auracite;
 
 public class AdventurerPlateStep : IStep
 {
-    // Remove when https://github.com/aers/FFXIVClientStructs/pull/1319 is merged
-    enum DecorationType
-    {
-        Invalid = 0x0,
-        Backing = 0x1,
-        PatternOverlay = 0x2,
-        PortraitFrame = 0x3,
-        PlateFrame = 0x4,
-        Accent = 0x5,
-    }
-
     public AdventurerPlateStep()
     {
         
@@ -70,33 +59,33 @@ public class AdventurerPlateStep : IStep
                         continue;
                     }
                     
-                    switch ((DecorationType)decoration.Index)
+                    switch (decoration.Type)
                     {
-                        case DecorationType.PatternOverlay:
+                        case AgentCharaCard.DecorationType.PatternOverlay:
                         {
                             Plugin.package.pattern_overlay = GetImage(ResolveCardDecoration(rowIndex))
                                 .ToBase64String(PngFormat.Instance);
                         }
                             break;
-                        case DecorationType.Backing:
+                        case AgentCharaCard.DecorationType.Backing:
                         {
                             Plugin.package.backing = GetImage(ResolveCardDecoration(rowIndex))
                                 .ToBase64String(PngFormat.Instance);
                         }
                             break;
-                        case DecorationType.PortraitFrame:
+                        case AgentCharaCard.DecorationType.PortraitFrame:
                         {
                             Plugin.package.portrait_frame = GetImage(ResolveCardDecoration(rowIndex))
                                 .ToBase64String(PngFormat.Instance);
                         }
                             break;
-                        case DecorationType.PlateFrame:
+                        case AgentCharaCard.DecorationType.PlateFrame:
                         {
                             Plugin.package.plate_frame = GetImage(ResolveCardDecoration(rowIndex))
                                 .ToBase64String(PngFormat.Instance);
                         }
                             break;
-                        case DecorationType.Accent:
+                        case AgentCharaCard.DecorationType.Accent:
                         {
                             Plugin.package.accent = GetImage(ResolveCardDecoration(rowIndex))
                                 .ToBase64String(PngFormat.Instance);
