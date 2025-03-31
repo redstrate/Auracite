@@ -9,6 +9,7 @@ use crate::downloader::download;
 use crate::html::{create_character_html, create_plate_html};
 use crate::parser::parse_search;
 use base64::prelude::*;
+use data::{Appearance, Currencies};
 use package::Package;
 use physis::race::{Gender, Race, Tribe};
 use reqwest::Url;
@@ -166,41 +167,48 @@ pub async fn archive_character(
         let package: Package = serde_json::from_str(&package.trim_start()).unwrap();
 
         // appearance data
-        char_data.appearance.model_type = package.model_type;
-        char_data.appearance.height = package.height;
-        char_data.appearance.face_type = package.face_type;
-        char_data.appearance.hair_style = package.hair_style;
-        char_data.appearance.has_highlights = package.has_highlights;
-        char_data.appearance.skin_color = package.skin_color;
-        char_data.appearance.eye_color = package.eye_color;
-        char_data.appearance.hair_color = package.hair_color;
-        char_data.appearance.hair_color2 = package.hair_color2;
-        char_data.appearance.face_features = package.face_features;
-        char_data.appearance.face_features_color = package.face_features_color;
-        char_data.appearance.eyebrows = package.eyebrows;
-        char_data.appearance.eye_color2 = package.eye_color2;
-        char_data.appearance.eye_shape = package.eye_color2;
-        char_data.appearance.nose_shape = package.nose_shape;
-        char_data.appearance.jaw_shape = package.jaw_shape;
-        char_data.appearance.lip_style = package.lip_style;
-        char_data.appearance.lip_color = package.lip_color;
-        char_data.appearance.race_feature_size = package.race_feature_size;
-        char_data.appearance.race_feature_type = package.race_feature_type;
-        char_data.appearance.bust_size = package.bust_size;
-        char_data.appearance.facepaint = package.facepaint;
-        char_data.appearance.facepaint_color = package.facepaint_color;
+        char_data.appearance = Some(Appearance {
+            race: char_data.race.clone(),
+            tribe: char_data.tribe.clone(),
+            gender: char_data.gender.clone(),
+            model_type: package.model_type,
+            height: package.height,
+            face_type: package.face_type,
+            hair_style: package.hair_style,
+            has_highlights: package.has_highlights,
+            skin_color: package.skin_color,
+            eye_color: package.eye_color,
+            hair_color: package.hair_color,
+            hair_color2: package.hair_color2,
+            face_features: package.face_features,
+            face_features_color: package.face_features_color,
+            eyebrows: package.eyebrows,
+            eye_color2: package.eye_color2,
+            eye_shape: package.eye_color2,
+            nose_shape: package.nose_shape,
+            jaw_shape: package.jaw_shape,
+            lip_style: package.lip_style,
+            lip_color: package.lip_color,
+            race_feature_size: package.race_feature_size,
+            race_feature_type: package.race_feature_type,
+            bust_size: package.bust_size,
+            facepaint: package.facepaint,
+            facepaint_color: package.facepaint_color,
+        });
 
-        char_data.playtime = package.playtime.parse().unwrap();
-        char_data.currencies.gil = package.gil; // TODO: also fetch from the lodestone
-        char_data.is_battle_mentor = package.is_battle_mentor;
-        char_data.is_trade_mentor = package.is_trade_mentor;
-        char_data.is_novice = package.is_novice;
-        char_data.is_returner = package.is_returner;
-        char_data.player_commendations = package.player_commendations; // TODO: fetch from the lodestone?
-        char_data.plate_title = package.plate_title;
-        char_data.plate_classjob = package.plate_class_job;
-        char_data.plate_classjob_level = package.plate_class_job_level;
-        char_data.search_comment = package.search_comment;
+        char_data.playtime = Some(package.playtime.parse().unwrap());
+        char_data.currencies = Some(Currencies {
+            gil: package.gil, // TODO: also fetch from the lodestone
+        });
+        char_data.is_battle_mentor = Some(package.is_battle_mentor);
+        char_data.is_trade_mentor = Some(package.is_trade_mentor);
+        char_data.is_novice = Some(package.is_novice);
+        char_data.is_returner = Some(package.is_returner);
+        char_data.player_commendations = Some(package.player_commendations); // TODO: fetch from the lodestone?
+        char_data.plate_title = Some(package.plate_title);
+        char_data.plate_classjob = Some(package.plate_class_job);
+        char_data.plate_classjob_level = Some(package.plate_class_job_level);
+        char_data.search_comment = Some(package.search_comment);
 
         zip.start_file("plate-portrait.png", options)?;
         zip.write_all(

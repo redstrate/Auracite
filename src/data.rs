@@ -43,18 +43,33 @@ pub struct CharacterData {
     pub city_state: String,
     pub nameday: String,
     pub guardian: String,
-    pub currencies: Currencies,
-    pub playtime: String,
-    pub appearance: Appearance,
-    pub is_battle_mentor: bool,
-    pub is_trade_mentor: bool,
-    pub is_novice: bool,
-    pub is_returner: bool,
-    pub player_commendations: i32,
-    pub plate_title: String,
-    pub plate_classjob: String,
-    pub plate_classjob_level: i32,
-    pub search_comment: String,
+    pub race: String,
+    pub gender: String,
+    pub tribe: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currencies: Option<Currencies>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub playtime: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub appearance: Option<Appearance>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_battle_mentor: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_trade_mentor: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_novice: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub is_returner: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub player_commendations: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plate_title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plate_classjob: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub plate_classjob_level: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search_comment: Option<String>,
 
     #[serde(skip)]
     pub face_url: String,
