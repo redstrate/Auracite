@@ -3,23 +3,23 @@ pub mod downloader;
 pub mod html;
 pub mod parser;
 
-use serde::Deserialize;
-use std::io::Write;
-use std::time::{SystemTime, UNIX_EPOCH};
-use physis::race::{Gender, Race, Subrace};
-use reqwest::Url;
-use zip::result::ZipError;
-use zip::write::SimpleFileOptions;
-use zip::ZipWriter;
+use crate::data::CharacterData;
 use crate::downloader::download;
 use crate::html::{create_character_html, create_plate_html};
 use crate::parser::parse_search;
 use base64::prelude::*;
-#[cfg(target_family = "wasm")]
-use wasm_bindgen::prelude::wasm_bindgen;
+use physis::race::{Gender, Race, Tribe};
+use reqwest::Url;
+use serde::Deserialize;
+use std::io::Write;
+use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::JsValue;
-use crate::data::CharacterData;
+#[cfg(target_family = "wasm")]
+use wasm_bindgen::prelude::wasm_bindgen;
+use zip::ZipWriter;
+use zip::result::ZipError;
+use zip::write::SimpleFileOptions;
 
 /// The main Lodestone domain
 const LODESTONE_HOST: &str = "https://na.finalfantasyxiv.com";
@@ -92,7 +92,7 @@ pub enum ArchiveError {
     CharacterNotFound,
     ParsingError,
     CouldNotConnectToDalamud,
-    UnknownError
+    UnknownError,
 }
 
 impl From<ZipError> for ArchiveError {
@@ -107,74 +107,46 @@ impl From<std::io::Error> for ArchiveError {
     }
 }
 
+impl From<physis::Error> for ArchiveError {
+    fn from(_: physis::Error) -> Self {
+        ArchiveError::UnknownError
+    }
+}
+
 #[cfg(target_family = "wasm")]
 impl From<ArchiveError> for JsValue {
     fn from(err: ArchiveError) -> Self {
         match err {
             // TODO: give JS the URL that failed to download
-            ArchiveError::DownloadFailed(_) => { JsValue::from_str(&"download_failed".to_string()) }
-            ArchiveError::CharacterNotFound => { JsValue::from_str(&"character_not_found".to_string()) }
-            ArchiveError::ParsingError => { JsValue::from_str(&"parsing_error".to_string())}
-            ArchiveError::UnknownError => { JsValue::from_str(&"unknown_error".to_string()) }
-            ArchiveError::CouldNotConnectToDalamud => { JsValue::from_str(&"could_not_connect_to_dalamud".to_string()) }
+            ArchiveError::DownloadFailed(_) => JsValue::from_str(&"download_failed".to_string()),
+            ArchiveError::CharacterNotFound => {
+                JsValue::from_str(&"character_not_found".to_string())
+            }
+            ArchiveError::ParsingError => JsValue::from_str(&"parsing_error".to_string()),
+            ArchiveError::UnknownError => JsValue::from_str(&"unknown_error".to_string()),
+            ArchiveError::CouldNotConnectToDalamud => {
+                JsValue::from_str(&"could_not_connect_to_dalamud".to_string())
+            }
         }
     }
 }
 
-// FIXME: this is stupid and also just copied from physis
-fn convert_dat_race(x: i32) -> Race {
-    match x {
-        1 => Race::Hyur,
-        2 => Race::Elezen,
-        3 => Race::Lalafell,
-        4 => Race::Miqote,
-        5 => Race::Roegadyn,
-        6 => Race::AuRa,
-        7 => Race::Hrothgar,
-        8 => Race::Viera,
-        _ => Race::Hyur,
-    }
-}
-
-fn convert_dat_gender(x: i32) -> Gender {
-    match x {
-        0 => Gender::Male,
-        1 => Gender::Female,
-        _ => Gender::Male,
-    }
-}
-
-fn convert_dat_subrace(x: i32) -> Subrace {
-    match x {
-        1 => Subrace::Midlander,
-        2 => Subrace::Highlander,
-        3 => Subrace::Wildwood,
-        4 => Subrace::Duskwight,
-        5 => Subrace::Plainsfolk,
-        6 => Subrace::Dunesfolk,
-        7 => Subrace::Seeker,
-        8 => Subrace::Keeper,
-        9 => Subrace::SeaWolf,
-        10 => Subrace::Hellsguard,
-        11 => Subrace::Raen,
-        12 => Subrace::Xaela,
-        13 => Subrace::Hellion,
-        14 => Subrace::Lost,
-        15 => Subrace::Rava,
-        16 => Subrace::Veena,
-        _ => Subrace::Midlander,
-    }
-}
-
 /// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
-pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Result<Vec<u8>, ArchiveError> {
+pub async fn archive_character(
+    character_name: &str,
+    use_dalamud: bool,
+) -> Result<Vec<u8>, ArchiveError> {
     let lodestone_host = if cfg!(target_family = "wasm") {
         LODESTONE_TUNNEL_HOST
     } else {
         LODESTONE_HOST
     };
 
-    let search_url = Url::parse_with_params(&format!("{lodestone_host}/lodestone/character?"), &[("q", character_name)]).map_err(|_| ArchiveError::UnknownError)?;
+    let search_url = Url::parse_with_params(
+        &format!("{lodestone_host}/lodestone/character?"),
+        &[("q", character_name)],
+    )
+    .map_err(|_| ArchiveError::UnknownError)?;
     let search_page = download(&search_url)
         .await
         .map_err(|_| ArchiveError::DownloadFailed(search_url.to_string()))?;
@@ -185,7 +157,8 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         return Err(ArchiveError::CharacterNotFound);
     }
 
-    let char_page_url = Url::parse(&format!("{lodestone_host}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
+    let char_page_url =
+        Url::parse(&format!("{lodestone_host}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
     let char_page = download(&char_page_url)
         .await
         .map_err(|_| ArchiveError::DownloadFailed(char_page_url.to_string()))?;
@@ -201,7 +174,9 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
 
     if !char_data.portrait_url.is_empty() {
         let portrait_url = if cfg!(target_family = "wasm") {
-            &char_data.portrait_url.replace(IMAGE_HOST, IMAGE_TUNNEL_HOST)
+            &char_data
+                .portrait_url
+                .replace(IMAGE_HOST, IMAGE_TUNNEL_HOST)
         } else {
             &char_data.portrait_url
         };
@@ -231,8 +206,11 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     }
 
     if use_dalamud {
-        let dalamud_url = Url::parse(&"http://localhost:42072/package").map_err(|_| ArchiveError::UnknownError)?;
-        let package = download(&dalamud_url).await.map_err(|_| ArchiveError::CouldNotConnectToDalamud)?;
+        let dalamud_url = Url::parse(&"http://localhost:42072/package")
+            .map_err(|_| ArchiveError::UnknownError)?;
+        let package = download(&dalamud_url)
+            .await
+            .map_err(|_| ArchiveError::CouldNotConnectToDalamud)?;
         let package = String::from_utf8(package).map_err(|_| ArchiveError::ParsingError)?;
         // Remove BOM at the start
         let package = package.trim_start_matches("\u{feff}");
@@ -276,46 +254,86 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         char_data.search_comment = package.search_comment;
 
         zip.start_file("plate-portrait.png", options)?;
-        zip.write_all(&*BASE64_STANDARD.decode(package.portrait.trim_start_matches("data:image/png;base64,")).unwrap())?;
+        zip.write_all(
+            &*BASE64_STANDARD
+                .decode(
+                    package
+                        .portrait
+                        .trim_start_matches("data:image/png;base64,"),
+                )
+                .unwrap(),
+        )?;
 
         if let Some(base_plate) = package.base_plate {
             zip.start_file("base-plate.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(base_plate.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(base_plate.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(pattern_overlay) = package.pattern_overlay {
             zip.start_file("pattern-overlay.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(pattern_overlay.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(pattern_overlay.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(backing) = package.backing {
             zip.start_file("backing.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(backing.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(backing.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(top_border) = package.top_border {
             zip.start_file("top-border.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(top_border.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(top_border.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(bottom_border) = package.bottom_border {
             zip.start_file("bottom-border.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(bottom_border.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(bottom_border.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(portrait_frame) = package.portrait_frame {
             zip.start_file("portrait-frame.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(portrait_frame.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(portrait_frame.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(plate_frame) = package.plate_frame {
             zip.start_file("plate-frame.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(plate_frame.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(plate_frame.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         if let Some(accent) = package.accent {
             zip.start_file("accent.png", options)?;
-            zip.write_all(&*BASE64_STANDARD.decode(accent.trim_start_matches("data:image/png;base64,")).unwrap())?;
+            zip.write_all(
+                &*BASE64_STANDARD
+                    .decode(accent.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
         }
 
         let timestamp: u32 = SystemTime::now()
@@ -328,11 +346,11 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         let char_dat = physis::chardat::CharacterData {
             version: 7,
             customize: physis::chardat::CustomizeData {
-                race: convert_dat_race(package.race),
-                gender: convert_dat_gender(package.gender),
+                race: (package.race as u8).try_into()?,
+                gender: (package.gender as u8).try_into()?,
                 age: package.model_type as u8,
                 height: package.height as u8,
-                subrace: convert_dat_subrace(package.tribe),
+                tribe: (package.tribe as u8).try_into()?,
                 face: package.face_type as u8,
                 hair: package.hair_style as u8,
                 enable_highlights: package.has_highlights,
@@ -364,7 +382,8 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
         zip.write_all(&*char_dat.write_to_buffer().unwrap())?;
 
         // Stop the HTTP server
-        let stop_url = Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
+        let stop_url =
+            Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
         // I'm intentionally ignoring the message because it doesn't matter if it fails - and it usually does
         let _ = download(&stop_url).await;
     }
@@ -373,14 +392,10 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
     zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
 
     zip.start_file("character.html", options)?;
-    zip.write_all(create_character_html(
-        &char_data
-    ).as_ref())?;
+    zip.write_all(create_character_html(&char_data).as_ref())?;
 
     zip.start_file("plate.html", options)?;
-    zip.write_all(create_plate_html(
-        &char_data
-    ).as_ref())?;
+    zip.write_all(create_plate_html(&char_data).as_ref())?;
 
     zip.finish()?;
 
@@ -390,10 +405,15 @@ pub async fn archive_character(character_name: &str, use_dalamud: bool) -> Resul
 /// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.
 #[cfg(target_family = "wasm")]
 #[wasm_bindgen]
-pub async extern fn archive_character_base64(character_name: &str, use_dalamud: bool) -> Result<String, ArchiveError> {
+pub async extern "C" fn archive_character_base64(
+    character_name: &str,
+    use_dalamud: bool,
+) -> Result<String, ArchiveError> {
     #[cfg(feature = "debug")]
     console_error_panic_hook::set_once();
 
-    let buf: String = archive_character(character_name, use_dalamud).await.map(|x| BASE64_STANDARD.encode(x))?;
+    let buf: String = archive_character(character_name, use_dalamud)
+        .await
+        .map(|x| BASE64_STANDARD.encode(x))?;
     return Ok(format!("data:application/octet-stream;charset=utf-16le;base64,{buf}").into());
 }

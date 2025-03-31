@@ -1,5 +1,5 @@
 use crate::data::CharacterData;
-use minijinja::{context, Environment};
+use minijinja::{Environment, context};
 
 /// Writes a visual HTML for `char_data` to `file_path`.
 /// This vaguely represents Lodestone and designed to visually check your character data.
@@ -29,10 +29,7 @@ pub fn create_character_html(char_data: &CharacterData) -> String {
 /// This vaguely represents Lodestone and designed to visually check your character data.
 pub fn create_plate_html(char_data: &CharacterData) -> String {
     let mut env = Environment::new();
-    env.add_template(
-        "plate.html",
-        include_str!("../templates/plate.html"),
-    )
+    env.add_template("plate.html", include_str!("../templates/plate.html"))
         .unwrap();
     let template = env.get_template("plate.html").unwrap();
     template

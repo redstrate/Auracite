@@ -9,10 +9,8 @@ pub async fn download(url: &Url) -> Result<Vec<u8>, reqwest::Error> {
     }
 
     let client = client.build()?;
-    
-    let body = client.get(url.to_string())
-        .send()
-        .await;
+
+    let body = client.get(url.to_string()).send().await;
 
     Ok(body?.bytes().await?.to_vec())
 }

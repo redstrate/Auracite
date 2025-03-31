@@ -9,7 +9,7 @@ const ENTRY_NAME_SELECTOR: &str = ".entry__name";
 pub fn parse_search(data: &str) -> String {
     let document = Html::parse_document(data);
     let mut href = String::new();
-    
+
     for element in document.select(&Selector::parse(ENTRY_SELECTOR).unwrap()) {
         if let Some(block_name) = element
             .select(&Selector::parse(ENTRY_NAME_SELECTOR).unwrap())

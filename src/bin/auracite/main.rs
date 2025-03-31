@@ -1,14 +1,21 @@
+use auracite::{ArchiveError, archive_character};
+use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAboutPerson, License};
+use cxx_kde_frameworks::ki18n::{KLocalizedContext, KLocalizedString, i18n, i18nc};
+use cxx_qt_lib::{
+    QByteArray, QGuiApplication, QList, QQmlApplicationEngine, QQuickStyle, QString, QStringList,
+    QUrl,
+};
+use cxx_qt_lib_extras::{QCommandLineOption, QCommandLineParser};
 use std::env::args;
 use std::fs::write;
-use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAboutPerson, License};
-use cxx_kde_frameworks::ki18n::{i18n, i18nc, KLocalizedContext, KLocalizedString};
-use cxx_qt_lib::{QByteArray, QGuiApplication, QList, QQmlApplicationEngine, QQuickStyle, QString, QStringList, QUrl};
-use cxx_qt_lib_extras::{QCommandLineOption, QCommandLineParser};
-use auracite::{archive_character, ArchiveError};
 
 pub mod bridge;
 
-fn archive_character_blocking(character_name: &String, use_dalamud: bool, filename: &String) -> Result<(), ArchiveError> {
+fn archive_character_blocking(
+    character_name: &String,
+    use_dalamud: bool,
+    filename: &String,
+) -> Result<(), ArchiveError> {
     let rt = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()
@@ -16,7 +23,7 @@ fn archive_character_blocking(character_name: &String, use_dalamud: bool, filena
 
     let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud))?;
     write(filename, inner)?;
-    
+
     Ok(())
 }
 
@@ -31,7 +38,10 @@ fn main() {
         QString::from("zone.xiv.auracite"),
         i18nc("@title", "Auracite"),
         QString::from(env!("CARGO_PKG_VERSION")),
-        i18nc("@title", "Export your FFXIV character in portable, generic formats."),
+        i18nc(
+            "@title",
+            "Export your FFXIV character in portable, generic formats.",
+        ),
         License::GPL_V3,
     );
 
@@ -44,13 +54,15 @@ fn main() {
         &i18n("Maintainer"),
         &QString::from("josh@redstrate.com"),
         &QString::from("https://redstrate.com"),
-        &QUrl::from(&QString::from("https://redstrate.com/rss-image.png"))
+        &QUrl::from(&QString::from("https://redstrate.com/rss-image.png")),
     ));
 
     KAboutData::set_application_data(&*about_data);
 
     let mut command_line_parser = QCommandLineParser::default();
-    about_data.as_mut().setup_command_line(&mut command_line_parser);
+    about_data
+        .as_mut()
+        .setup_command_line(&mut command_line_parser);
 
     let mut name_option = QCommandLineOption::from(&QString::from("name"));
     name_option.set_description(&i18n("The character's name."));
@@ -58,18 +70,30 @@ fn main() {
     command_line_parser.add_option(&name_option);
 
     let mut dalamud_option = QCommandLineOption::from(&QString::from("dalamud"));
-    dalamud_option.set_description(&i18n("Whether to import more data from the Auracite Dalamud plugin."));
+    dalamud_option.set_description(&i18n(
+        "Whether to import more data from the Auracite Dalamud plugin.",
+    ));
     command_line_parser.add_option(&dalamud_option);
 
-    command_line_parser.process(&QStringList::from(&QList::from(&args().map(|x| QString::from(x)).collect::<Vec<QString>>())));
-    about_data.as_mut().process_command_line(&mut command_line_parser);
+    command_line_parser.process(&QStringList::from(&QList::from(
+        &args().map(|x| QString::from(x)).collect::<Vec<QString>>(),
+    )));
+    about_data
+        .as_mut()
+        .process_command_line(&mut command_line_parser);
 
     if command_line_parser.is_set(&QString::from("name")) {
-        let character_name = command_line_parser.value(&QString::from("name")).to_string();
+        let character_name = command_line_parser
+            .value(&QString::from("name"))
+            .to_string();
 
         println!("Downloading character data for {}...", character_name);
 
-        archive_character_blocking(&character_name, command_line_parser.is_set(&QString::from("dalamud")), &format!("{}.zip", character_name));
+        archive_character_blocking(
+            &character_name,
+            command_line_parser.is_set(&QString::from("dalamud")),
+            &format!("{}.zip", character_name),
+        );
 
         return;
     }
@@ -79,7 +103,9 @@ fn main() {
     if let Some(mut engine) = engine.as_mut() {
         KLocalizedContext::initialize_engine(engine.as_mut().as_qqmlengine());
         // TODO: replace with loadModule (requires cxx-qt changes)
-        engine.load(&QUrl::from("qrc:/qt/qml/zone/xiv/auracite/src/bin/auracite/Main.qml"));
+        engine.load(&QUrl::from(
+            "qrc:/qt/qml/zone/xiv/auracite/src/bin/auracite/Main.qml",
+        ));
     }
 
     if let Some(app) = app.as_mut() {
