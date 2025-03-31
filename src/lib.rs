@@ -1,6 +1,7 @@
 pub mod data;
 pub mod downloader;
 pub mod html;
+pub mod package;
 pub mod parser;
 
 use crate::data::CharacterData;
@@ -8,6 +9,7 @@ use crate::downloader::download;
 use crate::html::{create_character_html, create_plate_html};
 use crate::parser::parse_search;
 use base64::prelude::*;
+use package::Package;
 use physis::race::{Gender, Race, Tribe};
 use reqwest::Url;
 use serde::Deserialize;
@@ -32,59 +34,6 @@ const IMAGE_HOST: &str = "img2.finalfantasyxiv.com";
 
 /// The image proxy used in WebAssembly builds. Needed for CORS.
 const IMAGE_TUNNEL_HOST: &str = "img-tunnel.ryne.moe";
-
-#[derive(Default, Deserialize, Clone)]
-struct Package {
-    playtime: String,
-    gil: u32,
-    is_battle_mentor: bool,
-    is_trade_mentor: bool,
-    is_novice: bool,
-    is_returner: bool,
-    player_commendations: i32,
-    pub portrait: String,
-    pub plate_title: String,
-    pub plate_title_is_prefix: bool,
-    pub plate_class_job: String,
-    pub plate_class_job_level: i32,
-    pub search_comment: String,
-    pub base_plate: Option<String>,
-    pub pattern_overlay: Option<String>,
-    pub backing: Option<String>,
-    pub top_border: Option<String>,
-    pub bottom_border: Option<String>,
-    pub portrait_frame: Option<String>,
-    pub plate_frame: Option<String>,
-    pub accent: Option<String>,
-
-    // Appearance
-    pub race: i32,
-    pub gender: i32,
-    pub model_type: i32,
-    pub height: i32,
-    pub tribe: i32,
-    pub face_type: i32,
-    pub hair_style: i32,
-    pub has_highlights: bool,
-    pub skin_color: i32,
-    pub eye_color: i32,
-    pub hair_color: i32,
-    pub hair_color2: i32,
-    pub face_features: i32,
-    pub face_features_color: i32,
-    pub eyebrows: i32,
-    pub eye_color2: i32,
-    pub eye_shape: i32,
-    pub nose_shape: i32,
-    pub jaw_shape: i32,
-    pub lip_style: i32,
-    pub lip_color: i32,
-    pub race_feature_size: i32,
-    pub race_feature_type: i32,
-    pub bust_size: i32,
-    pub facepaint: i32,
-    pub facepaint_color: i32,
-}
 
 #[derive(Debug)]
 pub enum ArchiveError {
