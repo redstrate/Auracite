@@ -1,10 +1,9 @@
 # Auracite
 
-Export your FFXIV character in portable, generic formats.
-
-In the eventual future, the official servers will shut down and the Lodestone will disappear. This tool exports your
-character's data in machine-readable JSON (so it can be imported by something else) and a Lodestone-like HTML page which
-you can display in your browser.
+Export your FFXIV character in portable, generic formats. This includes
+data in machine-readable JSON (so it can be imported by other programs
+like [Kawari](https://github.com/redstrate/Kawari)) and a Lodestone-like
+HTML page which you can display in your browser.
 
 ## Usage
 
