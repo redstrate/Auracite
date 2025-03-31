@@ -1,5 +1,9 @@
 use serde::Serialize;
 
+use crate::value::{
+    CityStateValue, GenderValue, GuardianValue, NamedayValue, RaceValue, TribeValue, WorldValue,
+};
+
 #[derive(Default, Serialize)]
 pub struct Currencies {
     pub gil: u32,
@@ -38,14 +42,14 @@ pub struct Appearance {
 #[derive(Default, Serialize)]
 pub struct CharacterData {
     pub name: String,
-    pub world: String,
+    pub world: WorldValue,
     pub data_center: String,
-    pub city_state: String,
-    pub nameday: String,
-    pub guardian: String,
-    pub race: String,
-    pub gender: String,
-    pub tribe: String,
+    pub city_state: CityStateValue,
+    pub nameday: NamedayValue,
+    pub guardian: GuardianValue,
+    pub race: RaceValue,
+    pub gender: GenderValue,
+    pub tribe: TribeValue,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currencies: Option<Currencies>,
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -1,4 +1,9 @@
-use crate::data::CharacterData;
+use crate::{
+    data::CharacterData,
+    value::{
+        CityStateValue, GenderValue, GuardianValue, NamedayValue, RaceValue, TribeValue, WorldValue,
+    },
+};
 use regex::Regex;
 use scraper::{Html, Selector};
 
@@ -50,7 +55,8 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
         let re = Regex::new(r"(\w+)\s\[(\w+)\]").unwrap();
         let inner_html = element.inner_html();
         let captures = re.captures(&inner_html).unwrap();
-        char_data.world = captures.get(1).unwrap().as_str().to_owned();
+        // TODO: use error
+        char_data.world = WorldValue::try_from(captures.get(1).unwrap().as_str()).unwrap();
         char_data.data_center = captures.get(2).unwrap().as_str().to_owned();
     }
 
@@ -69,31 +75,33 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
                     let inner_html = block_name.inner_html();
                     let captures = re.captures(&inner_html).unwrap();
 
-                    char_data.race = captures.get(1).unwrap().as_str().to_owned();
-                    char_data.tribe = captures.get(2).unwrap().as_str().to_owned();
-                    if captures.get(3).unwrap().as_str() == "♀" {
-                        char_data.gender = "Female".parse().unwrap();
-                    } else {
-                        char_data.gender = "Male".parse().unwrap();
-                    }
+                    char_data.race =
+                        RaceValue::try_from(captures.get(1).unwrap().as_str()).unwrap();
+                    char_data.tribe =
+                        TribeValue::try_from(captures.get(2).unwrap().as_str()).unwrap();
+                    char_data.gender =
+                        GenderValue::try_from(captures.get(3).unwrap().as_str()).unwrap();
                 }
             } else if name == "City-state" {
                 if let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
                     .nth(0)
                 {
-                    char_data.city_state = block_name.inner_html();
+                    char_data.city_state =
+                        CityStateValue::try_from(block_name.inner_html().as_str()).unwrap();
                 }
             } else if name == "Nameday" {
                 for element in element.select(&Selector::parse(NAMEDAY_SELECTOR).unwrap()) {
-                    char_data.nameday = element.inner_html();
+                    char_data.nameday =
+                        NamedayValue::try_from(element.inner_html().as_str()).unwrap();
                 }
 
                 if let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
                     .nth(0)
                 {
-                    char_data.guardian = block_name.inner_html();
+                    char_data.guardian =
+                        GuardianValue::try_from(block_name.inner_html().as_str()).unwrap();
                 }
             }
         }

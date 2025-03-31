@@ -14,13 +14,13 @@ pub fn create_character_html(char_data: &CharacterData) -> String {
     template
         .render(context! {
             name => char_data.name,
-            world => char_data.world,
+            world => char_data.world.name,
             data_center => char_data.data_center,
-            race => char_data.race,
-            subrace => char_data.tribe,
-            gender => char_data.gender,
-            nameday => char_data.nameday,
-            city_state => char_data.city_state
+            race => char_data.race.name,
+            subrace => char_data.tribe.name,
+            gender => char_data.gender.name,
+            nameday => char_data.nameday.value,
+            city_state => char_data.city_state.name
         })
         .unwrap()
 }
@@ -35,7 +35,7 @@ pub fn create_plate_html(char_data: &CharacterData) -> String {
     template
         .render(context! {
             name => char_data.name,
-            world => char_data.world,
+            world => char_data.world.name,
             data_center => char_data.data_center,
             title => char_data.plate_title,
             level => char_data.plate_classjob_level,

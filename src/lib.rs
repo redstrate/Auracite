@@ -3,6 +3,7 @@ pub mod downloader;
 pub mod html;
 pub mod package;
 pub mod parser;
+pub mod value;
 
 use crate::data::CharacterData;
 use crate::downloader::download;
@@ -168,9 +169,9 @@ pub async fn archive_character(
 
         // appearance data
         char_data.appearance = Some(Appearance {
-            race: char_data.race.clone(),
-            tribe: char_data.tribe.clone(),
-            gender: char_data.gender.clone(),
+            race: char_data.race.name.clone(),
+            tribe: char_data.tribe.name.clone(),
+            gender: char_data.gender.name.clone(),
             model_type: package.model_type,
             height: package.height,
             face_type: package.face_type,
