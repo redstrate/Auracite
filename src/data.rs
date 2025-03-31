@@ -1,7 +1,8 @@
 use serde::Serialize;
 
 use crate::value::{
-    CityStateValue, GenderValue, GuardianValue, NamedayValue, RaceValue, TribeValue, WorldValue,
+    CityStateValue, ClassJobValue, GenderValue, GuardianValue, NamedayValue, RaceValue, TribeValue,
+    WorldValue,
 };
 
 #[derive(Default, Serialize)]
@@ -50,6 +51,8 @@ pub struct CharacterData {
     pub race: RaceValue,
     pub gender: GenderValue,
     pub tribe: TribeValue,
+    pub classjob_levels: Vec<ClassJobValue>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currencies: Option<Currencies>,
     #[serde(skip_serializing_if = "Option::is_none")]

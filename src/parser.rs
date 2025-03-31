@@ -1,7 +1,8 @@
 use crate::{
     data::CharacterData,
     value::{
-        CityStateValue, GenderValue, GuardianValue, NamedayValue, RaceValue, TribeValue, WorldValue,
+        CityStateValue, ClassJobValue, GenderValue, GuardianValue, NamedayValue, RaceValue,
+        TribeValue, WorldValue,
     },
 };
 use regex::Regex;
@@ -40,6 +41,7 @@ const CHARACTER_BLOCK_NAME_SELECTOR: &str = ".character-block__name";
 const FACE_IMG_SELECTOR: &str = ".frame__chara__face > img";
 const PORTRAIT_IMG_SELECTOR: &str = ".character__detail__image > a > img";
 const NAMEDAY_SELECTOR: &str = ".character-block__birth";
+const CLASSJOB_SELECTOR: &str = ".character__level__list > ul > li";
 
 /// Parses the HTML from `data` and returns `CharacterData`. The data may be incomplete.
 pub fn parse_lodestone(data: &str) -> CharacterData {
@@ -116,6 +118,31 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
         .nth(0)
     {
         char_data.portrait_url = element.attr("src").unwrap().parse().unwrap();
+    }
+
+    for element in document.select(&Selector::parse(CLASSJOB_SELECTOR).unwrap()) {
+        let img = element.first_child().unwrap();
+        let name = img
+            .value()
+            .as_element()
+            .unwrap()
+            .attr("data-tooltip")
+            .unwrap();
+
+        // ignore "-" and other invalid level values
+        if let Ok(level) = element
+            .last_child()
+            .unwrap()
+            .value()
+            .as_text()
+            .unwrap()
+            .parse::<i32>()
+        {
+            char_data.classjob_levels.push(ClassJobValue {
+                name: name.to_string(),
+                level,
+            });
+        }
     }
 
     char_data

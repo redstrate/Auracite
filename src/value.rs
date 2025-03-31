@@ -292,3 +292,11 @@ impl TryFrom<&str> for NamedayValue {
         })
     }
 }
+
+#[derive(Default, Serialize)]
+pub struct ClassJobValue {
+    /// Name of the class or job.
+    pub name: String,
+    /// Level of the class or job.
+    pub level: i32,
+}
