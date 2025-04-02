@@ -23,6 +23,7 @@ pub struct Package {
     pub portrait_frame: Option<String>,
     pub plate_frame: Option<String>,
     pub accent: Option<String>,
+    pub voice: i32,
 
     // Appearance
     pub race: i32,

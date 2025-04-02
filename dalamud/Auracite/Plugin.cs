@@ -73,6 +73,8 @@ public sealed class Plugin : IDalamudPlugin
         public string? portrait_frame;
         public string? plate_frame;
         public string? accent;
+
+        public int voice;
     }
 
     public static Package? package;

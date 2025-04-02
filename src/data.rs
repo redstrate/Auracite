@@ -77,6 +77,8 @@ pub struct CharacterData {
     pub plate_classjob_level: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search_comment: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub voice: Option<i32>,
 
     #[serde(skip)]
     pub face_url: String,

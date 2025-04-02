@@ -1,5 +1,6 @@
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
 namespace Auracite;
 
@@ -16,6 +17,13 @@ public class MiscStep : IStep
             Plugin.package.is_novice = PlayerState.Instance()->IsNovice();
             Plugin.package.is_returner = PlayerState.Instance()->IsReturner();
             Plugin.package.player_commendations = PlayerState.Instance()->PlayerCommendations;
+
+            var localPlayer = Plugin.ClientState.LocalPlayer;
+            if (localPlayer != null)
+            {
+                var gameObject = (Character*)localPlayer.Address;
+                Plugin.package.voice = gameObject->Vfx.VoiceId;
+            }
         }
 
         Completed?.Invoke();
