@@ -31,7 +31,7 @@ pub mod bridge {
     }
 }
 
-use crate::archive_character_blocking;
+use crate::{archive_character_blocking, search_character_blocking};
 use auracite::ArchiveError;
 use cxx_kde_frameworks::ki18n::i18n;
 use cxx_qt_lib::QString;
@@ -47,11 +47,12 @@ impl bridge::Backend {
         use_dalamud: bool,
         filename: &QString,
     ) {
-        match archive_character_blocking(
-            &character_name.to_string(),
-            use_dalamud,
-            &filename.to_string(),
-        ) {
+        let Some(id) = search_character_blocking(&character_name.to_string()) else {
+            self.archive_failed(&i18n("Character not found"));
+            return;
+        };
+
+        match archive_character_blocking(id, use_dalamud, &filename.to_string()) {
             Ok(_) => self.archive_successful(),
             Err(err) => {
                 match err {

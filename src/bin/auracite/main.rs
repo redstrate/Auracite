@@ -11,8 +11,17 @@ use std::fs::write;
 
 pub mod bridge;
 
+fn search_character_blocking(character_name: &String) -> Option<u64> {
+    let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .ok()?;
+
+    rt.block_on(search_character(&character_name.to_string()))
+}
+
 fn archive_character_blocking(
-    character_name: &String,
+    id: u64,
     use_dalamud: bool,
     filename: &String,
 ) -> Result<(), ArchiveError> {
@@ -20,10 +29,6 @@ fn archive_character_blocking(
         .enable_all()
         .build()
         .map_err(|_| ArchiveError::UnknownError)?;
-
-    let id = rt
-        .block_on(search_character(&character_name.to_string()))
-        .expect("Character not found!");
 
     let inner = rt.block_on(archive_character(id, use_dalamud))?;
     write(filename, inner)?;
@@ -73,6 +78,11 @@ fn main() {
     name_option.set_value_name(&QString::from("name"));
     command_line_parser.add_option(&name_option);
 
+    let mut id_option = QCommandLineOption::from(&QString::from("id"));
+    id_option.set_description(&i18n("The character's Lodestone ID."));
+    id_option.set_value_name(&QString::from("id"));
+    command_line_parser.add_option(&id_option);
+
     let mut dalamud_option = QCommandLineOption::from(&QString::from("dalamud"));
     dalamud_option.set_description(&i18n(
         "Whether to import more data from the Auracite Dalamud plugin.",
@@ -93,10 +103,30 @@ fn main() {
 
         println!("Downloading character data for {}...", character_name);
 
+        let id = search_character_blocking(&character_name).expect("Couldn't find character!");
+
         archive_character_blocking(
-            &character_name,
+            id,
             command_line_parser.is_set(&QString::from("dalamud")),
             &format!("{}.zip", character_name),
+        );
+
+        return;
+    }
+
+    if command_line_parser.is_set(&QString::from("id")) {
+        let id = command_line_parser
+            .value(&QString::from("id"))
+            .to_string()
+            .parse()
+            .expect("Not a valid ID!");
+
+        println!("Downloading character data for {}...", id);
+
+        archive_character_blocking(
+            id,
+            command_line_parser.is_set(&QString::from("dalamud")),
+            &format!("{}.zip", id), // TODO: give it the character's name
         );
 
         return;
