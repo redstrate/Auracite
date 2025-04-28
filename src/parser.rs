@@ -224,11 +224,11 @@ fn parse_item_tooltip(element: &scraper::ElementRef<'_>) -> Option<ItemValue> {
         .select(&Selector::parse(".db-tooltip__item__name").unwrap())
         .nth(0)
     {
-        let text: String = slot.text().collect();
-        let item_name = text.strip_suffix("\u{e03c}").unwrap();
-        return Some(ItemValue {
-            name: item_name.to_string(),
-        });
+        let mut text: String = slot.text().collect();
+        if text.contains("\u{e03c}") {
+            text = text.strip_suffix("\u{e03c}").unwrap().to_string();
+        }
+        return Some(ItemValue { name: text });
     }
 
     None
