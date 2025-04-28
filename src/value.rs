@@ -181,7 +181,7 @@ impl TryFrom<&str> for RaceValue {
             "Lalafell" => 3,
             "Miqo'te" => 4,
             "Roegadyn" => 5,
-            "AuRa" => 6,
+            "Au Ra" => 6,
             "Hrothgar" => 7,
             "Viera" => 8,
             _ => return Err(ArchiveError::ParsingError),
