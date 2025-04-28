@@ -53,6 +53,8 @@ pub struct CharacterData {
     pub tribe: TribeValue,
     pub classjob_levels: Vec<ClassJobValue>,
     pub grand_company: GrandCompanyValue,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub free_company: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currencies: Option<Currencies>,
