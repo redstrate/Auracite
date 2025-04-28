@@ -43,6 +43,7 @@ const PORTRAIT_IMG_SELECTOR: &str = ".character__detail__image > a > img";
 const NAMEDAY_SELECTOR: &str = ".character-block__birth";
 const CLASSJOB_SELECTOR: &str = ".character__level__list > ul > li";
 const FREE_COMPANY_SELECTOR: &str = ".character__freecompany__name > h4 > a";
+const TITLE_SELECTOR: &str = ".frame__chara__title";
 
 /// Parses the HTML from `data` and returns `CharacterData`. The data may be incomplete.
 pub fn parse_lodestone(data: &str) -> CharacterData {
@@ -52,6 +53,13 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
 
     for element in document.select(&Selector::parse(CHARACTER_NAME_SELECTOR).unwrap()) {
         char_data.name = element.inner_html();
+    }
+
+    if let Some(title) = document
+        .select(&Selector::parse(TITLE_SELECTOR).unwrap())
+        .nth(0)
+    {
+        char_data.title = Some(title.inner_html().as_str().to_string());
     }
 
     for element in document.select(&Selector::parse(WORLD_DATA_CENTER_SELECTOR).unwrap()) {
@@ -121,11 +129,11 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
             }
         }
 
-        if let Some(block_name) = element
+        if let Some(free_company) = element
             .select(&Selector::parse(FREE_COMPANY_SELECTOR).unwrap())
             .nth(0)
         {
-            char_data.free_company = Some(block_name.inner_html().as_str().to_string());
+            char_data.free_company = Some(free_company.inner_html().as_str().to_string());
         }
     }
 
