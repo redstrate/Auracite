@@ -1,8 +1,8 @@
 use serde::Serialize;
 
 use crate::value::{
-    CityStateValue, ClassJobValue, GenderValue, GrandCompanyValue, GuardianValue, NamedayValue,
-    RaceValue, TribeValue, WorldValue,
+    CityStateValue, ClassJobValue, GenderValue, GrandCompanyValue, GuardianValue, ItemValue,
+    NamedayValue, RaceValue, TribeValue, WorldValue,
 };
 
 #[derive(Default, Serialize)]
@@ -41,6 +41,36 @@ pub struct Appearance {
 }
 
 #[derive(Default, Serialize)]
+pub struct EquippedItems {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub main_hand: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub off_hand: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub head: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hands: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub legs: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub feet: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub earrings: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub necklace: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub bracelets: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub left_ring: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub right_ring: Option<ItemValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub soul_crystal: Option<ItemValue>,
+}
+
+#[derive(Default, Serialize)]
 pub struct CharacterData {
     pub name: String,
     pub world: WorldValue,
@@ -57,6 +87,7 @@ pub struct CharacterData {
     pub free_company: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
+    pub equipped: EquippedItems,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub currencies: Option<Currencies>,

@@ -1,8 +1,8 @@
 use crate::{
     data::CharacterData,
     value::{
-        CityStateValue, ClassJobValue, GenderValue, GuardianValue, NamedayValue, RaceValue,
-        TribeValue, WorldValue,
+        CityStateValue, ClassJobValue, GenderValue, GuardianValue, ItemValue, NamedayValue,
+        RaceValue, TribeValue, WorldValue,
     },
 };
 use regex::Regex;
@@ -173,5 +173,63 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
         }
     }
 
+    // TODO: support facewear
+    let item_slot_selectors = [
+        ".icon-c--0",  // Main Hand
+        ".icon-c--1",  // Off hand
+        ".icon-c--2",  // Head
+        ".icon-c--3",  // Body
+        ".icon-c--4",  // Hands
+        ".icon-c--6",  // Legs
+        ".icon-c--7",  // Feet
+        ".icon-c--8",  // Earrings
+        ".icon-c--9",  // Necklace
+        ".icon-c--10", // Bracelets
+        ".icon-c--11", // Left Ring
+        ".icon-c--12", // Right Ring
+        ".icon-c--13", // Soul Crystal
+    ];
+
+    for (i, selector) in item_slot_selectors.iter().enumerate() {
+        if let Some(slot) = document.select(&Selector::parse(selector).unwrap()).nth(0) {
+            if let Some(item) = slot.select(&Selector::parse(".db-tooltip").unwrap()).nth(0) {
+                let parsed_item = parse_item_tooltip(&item);
+                let slot = match i {
+                    0 => &mut char_data.equipped.main_hand,
+                    1 => &mut char_data.equipped.off_hand,
+                    2 => &mut char_data.equipped.head,
+                    3 => &mut char_data.equipped.body,
+                    4 => &mut char_data.equipped.hands,
+                    5 => &mut char_data.equipped.legs,
+                    6 => &mut char_data.equipped.feet,
+                    7 => &mut char_data.equipped.earrings,
+                    8 => &mut char_data.equipped.necklace,
+                    9 => &mut char_data.equipped.bracelets,
+                    10 => &mut char_data.equipped.left_ring,
+                    11 => &mut char_data.equipped.right_ring,
+                    12 => &mut char_data.equipped.soul_crystal,
+                    _ => panic!("Unexpected slot!"),
+                };
+
+                *slot = parsed_item;
+            }
+        }
+    }
+
     char_data
+}
+
+fn parse_item_tooltip(element: &scraper::ElementRef<'_>) -> Option<ItemValue> {
+    if let Some(slot) = element
+        .select(&Selector::parse(".db-tooltip__item__name").unwrap())
+        .nth(0)
+    {
+        let text: String = slot.text().collect();
+        let item_name = text.strip_suffix("\u{e03c}").unwrap();
+        return Some(ItemValue {
+            name: item_name.to_string(),
+        });
+    }
+
+    None
 }

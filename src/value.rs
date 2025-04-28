@@ -308,3 +308,9 @@ pub struct GrandCompanyValue {
     /// Name of your rank in the grand company.
     pub rank: String,
 }
+
+#[derive(Default, Serialize)]
+pub struct ItemValue {
+    /// Name of the item.
+    pub name: String,
+}
