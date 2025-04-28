@@ -300,3 +300,11 @@ pub struct ClassJobValue {
     /// Level of the class or job.
     pub level: i32,
 }
+
+#[derive(Default, Serialize)]
+pub struct GrandCompanyValue {
+    /// Name of the grand company.
+    pub name: String,
+    /// Name of your rank in the grand company.
+    pub rank: String,
+}

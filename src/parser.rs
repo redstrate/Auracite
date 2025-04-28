@@ -105,6 +105,18 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
                     char_data.guardian =
                         GuardianValue::try_from(block_name.inner_html().as_str()).unwrap();
                 }
+            } else if name == "Grand Company" {
+                if let Some(block_name) = element
+                    .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
+                    .nth(0)
+                {
+                    let re = Regex::new(r"([^\/]+)\s\/\s([^\/]+)").unwrap();
+                    let inner_html = block_name.inner_html();
+                    let captures = re.captures(&inner_html).unwrap();
+
+                    char_data.grand_company.name = captures.get(1).unwrap().as_str().to_string();
+                    char_data.grand_company.rank = captures.get(2).unwrap().as_str().to_string();
+                }
             }
         }
     }
