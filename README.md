@@ -26,6 +26,7 @@ Provide a character name via `--name`:
 auracite --name "John Doe" 
 ```
 
+
 To enable support for the Dalamud plugin, add `--dalamud`.
 
 ## Building
@@ -48,25 +49,6 @@ Auracite can only collect so much data from the Lodestone, some data can only be
 we provide a Dalamud plugin to run alongside the tool. The plugin is currently available
 [in my personal Dalamud repository](https://github.com/redstrate/DalamudPlugins). The plugin can be
 safely removed if you're done using Auracite.
-
-## Supported Data
-
-| Data                      | Supported | Notes                                                                             |
-|---------------------------|-----------|-----------------------------------------------------------------------------------|
-| Name                      | ✅         |                                                                                   |
-| World/Data Center         | ✅         |                                                                                   |
-| Race/Subrace/Gender       | ✅         |                                                                                   |
-| City-state                | ✅         |                                                                                   |
-| Nameday                   | ✅         |                                                                                   |
-| Guardian                  | ✅         |                                                                                   |
-| Portrait/Full-body Images | ✅         | These are the images displayed on the Lodestone.                                  |
-| Playtime                  | ✅         | Requires the Dalamud plugin.                                                      |
-| Currencies                | ⭕️        | Only gil is supported, and requires the Dalamud plugin.                           |
-| Appearance Data           | ✅         | Requires the Dalamud plugin.                                                      |
-| Adventurer Plate          | ✅         | Requires the Dalamud plugin.                                                      |
-| Misc. state               | ⭕️        | Mentor and novice status, also player commendations. Requires the Dalamud plugin. |
-
-Currently, more types of data is planned to be supported in the future.
 
 ## License
 
