@@ -5,3 +5,4 @@ config.json
 obj/
 *.user
 dalamud/Auracite/bin
+*.zip

@@ -76,7 +76,6 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
                 {
                     let re = Regex::new(r"([^<]+)<br>([^\/]+)\s\/\s(\W)").unwrap();
                     let inner_html = block_name.inner_html();
-                    dbg!(&inner_html);
                     let captures = re.captures(&inner_html).unwrap();
 
                     char_data.race =
