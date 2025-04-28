@@ -348,7 +348,7 @@ pub async fn archive_character(
     }
 
     zip.start_file("character.json", options)?;
-    zip.write_all(serde_json::to_string(&char_data).unwrap().as_ref())?;
+    zip.write_all(serde_json::to_string_pretty(&char_data).unwrap().as_ref())?;
 
     zip.start_file("character.html", options)?;
     zip.write_all(create_character_html(&char_data).as_ref())?;
