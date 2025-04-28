@@ -42,7 +42,7 @@ const FACE_IMG_SELECTOR: &str = ".frame__chara__face > img";
 const PORTRAIT_IMG_SELECTOR: &str = ".character__detail__image > a > img";
 const NAMEDAY_SELECTOR: &str = ".character-block__birth";
 const CLASSJOB_SELECTOR: &str = ".character__level__list > ul > li";
-const FREE_COMPANY_SELECTOR: &str = ".character__freecompany__name > p";
+const FREE_COMPANY_SELECTOR: &str = ".character__freecompany__name > h4 > a";
 
 /// Parses the HTML from `data` and returns `CharacterData`. The data may be incomplete.
 pub fn parse_lodestone(data: &str) -> CharacterData {
