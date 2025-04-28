@@ -13,6 +13,7 @@ use base64::prelude::*;
 use data::{Appearance, Currencies};
 use package::Package;
 use physis::race::{Gender, Race, Tribe};
+use regex::Regex;
 use reqwest::Url;
 use serde::Deserialize;
 use std::io::Write;
@@ -82,11 +83,8 @@ impl From<ArchiveError> for JsValue {
     }
 }
 
-/// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
-pub async fn archive_character(
-    character_name: &str,
-    use_dalamud: bool,
-) -> Result<Vec<u8>, ArchiveError> {
+/// Searches for the character by their name.
+pub async fn search_character(character_name: &str) -> Option<u64> {
     let lodestone_host = if cfg!(target_family = "wasm") {
         LODESTONE_TUNNEL_HOST
     } else {
@@ -97,19 +95,37 @@ pub async fn archive_character(
         &format!("{lodestone_host}/lodestone/character?"),
         &[("q", character_name)],
     )
-    .map_err(|_| ArchiveError::UnknownError)?;
+    .map_err(|_| ArchiveError::UnknownError)
+    .ok()?;
     let search_page = download(&search_url)
         .await
-        .map_err(|_| ArchiveError::DownloadFailed(search_url.to_string()))?;
-    let search_page = String::from_utf8(search_page).map_err(|_| ArchiveError::ParsingError)?;
+        .map_err(|_| ArchiveError::DownloadFailed(search_url.to_string()))
+        .ok()?;
+    let search_page = String::from_utf8(search_page)
+        .map_err(|_| ArchiveError::ParsingError)
+        .ok()?;
 
     let href = parse_search(&search_page);
     if href.is_empty() {
-        return Err(ArchiveError::CharacterNotFound);
+        return None;
     }
 
-    let char_page_url =
-        Url::parse(&format!("{lodestone_host}{}", href)).map_err(|_| ArchiveError::UnknownError)?;
+    let re = Regex::new(r"\/lodestone\/character\/(\d+)").ok()?;
+    let captures = re.captures(&href)?;
+
+    captures.get(1)?.as_str().parse().ok()
+}
+
+/// Archives the character named `character_name` and gives a ZIP file as bytes that can be written to disk.
+pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, ArchiveError> {
+    let lodestone_host = if cfg!(target_family = "wasm") {
+        LODESTONE_TUNNEL_HOST
+    } else {
+        LODESTONE_HOST
+    };
+
+    let char_page_url = Url::parse(&format!("{lodestone_host}/lodestone/character/{}/", id))
+        .map_err(|_| ArchiveError::UnknownError)?;
     let char_page = download(&char_page_url)
         .await
         .map_err(|_| ArchiveError::DownloadFailed(char_page_url.to_string()))?;
@@ -361,17 +377,17 @@ pub async fn archive_character(
     Ok(buf)
 }
 
-/// Archives the character named `character_name` and converts the ZIP file to Base64. Useful for downloading via data URIs.
+/// Archives the character `id` and converts the ZIP file to Base64. Useful for downloading via data URIs.
 #[cfg(target_family = "wasm")]
 #[wasm_bindgen]
 pub async extern "C" fn archive_character_base64(
-    character_name: &str,
+    id: u64,
     use_dalamud: bool,
 ) -> Result<String, ArchiveError> {
     #[cfg(feature = "debug")]
     console_error_panic_hook::set_once();
 
-    let buf: String = archive_character(character_name, use_dalamud)
+    let buf: String = archive_character(id, use_dalamud)
         .await
         .map(|x| BASE64_STANDARD.encode(x))?;
     return Ok(format!("data:application/octet-stream;charset=utf-16le;base64,{buf}").into());

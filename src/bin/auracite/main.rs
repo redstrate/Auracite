@@ -1,4 +1,4 @@
-use auracite::{ArchiveError, archive_character};
+use auracite::{ArchiveError, archive_character, search_character};
 use cxx_kde_frameworks::kcoreaddons::{KAboutData, KAboutPerson, License};
 use cxx_kde_frameworks::ki18n::{KLocalizedContext, KLocalizedString, i18n, i18nc};
 use cxx_qt_lib::{
@@ -21,7 +21,11 @@ fn archive_character_blocking(
         .build()
         .map_err(|_| ArchiveError::UnknownError)?;
 
-    let inner = rt.block_on(archive_character(&character_name.to_string(), use_dalamud))?;
+    let id = rt
+        .block_on(search_character(&character_name.to_string()))
+        .expect("Character not found!");
+
+    let inner = rt.block_on(archive_character(id, use_dalamud))?;
     write(filename, inner)?;
 
     Ok(())
