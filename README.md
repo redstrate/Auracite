@@ -1,18 +1,15 @@
 # Auracite
 
 Export your FFXIV character in portable, generic formats. This includes
-data in machine-readable JSON (so it can be imported by other programs
-like [Kawari](https://github.com/redstrate/Kawari)) and a Lodestone-like
+data in machine-readable JSON (and can be imported by other programs
+like [Kawari](https://github.com/redstrate/Kawari)) and a Lodestone-esque
 HTML page which you can display in your browser.
 
 ## Usage
 
-This tool makes several HTTP requests to the Lodestone, but they currently are only a few. The tool does not contact any
-3rd-party external services.
-
 ### Web
 
-Auracite can run inside your web browser, accessed at [auracite.xiv.zone](https://auracite.xiv.zone/). It has the same features as the regular version.
+Auracite can run inside your web browser, accessed at [auracite.xiv.zone](https://auracite.xiv.zone/). It works exactly the same as the regular version.
 
 ### Desktop
 
@@ -26,6 +23,11 @@ Provide a character name via `--name`:
 auracite --name "John Doe" 
 ```
 
+Or provide a Lodestone id:
+
+```shell
+auracite --id 9001
+```
 
 To enable support for the Dalamud plugin, add `--dalamud`.
 
@@ -33,7 +35,7 @@ To enable support for the Dalamud plugin, add `--dalamud`.
 
 ### Desktop
 
-To run the desktop client, simply run `cargo run`. You must have Qt6 development packages installed beforehand.
+To run the desktop client, simply run `cargo run`. You need the Qt6 development packages installed beforehand.
 
 ### Flatpak
 
