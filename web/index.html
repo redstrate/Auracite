@@ -5,19 +5,31 @@
         <meta charset="utf-8"/>
         <title>Auracite</title>
         <script type="module">
-            import init, {archive_character_base64} from "./pkg/auracite.js";
+            import init, {archive_character_base64, search_for_character} from "./pkg/auracite.js";
 
             function archive() {
                 init().then(() => {
-                    archive_character_base64(document.getElementById("name").value, document.getElementById("scales").checked).then((uri) => {
-                        // Download character archive
-                        var link = document.createElement('a');
-                        link.download = document.getElementById("name").value + ".zip";
-                        link.href = uri;
-                        link.click();
-                        document.getElementById("statusMessage").innerText = "Archive complete!";
+                    console.debug("Auracite initialized successfully!");
+
+                    let name = document.getElementById("name").value;
+
+                    search_for_character(name).then((id) => {
+                        console.debug("Lodestone id for " + name + ": " + id);
+
+                        archive_character_base64(id, document.getElementById("scales").checked).then((uri) => {
+                            console.debug("Archive complete!");
+
+                            // Download character archive
+                            var link = document.createElement('a');
+                            link.download = name + ".zip";
+                            link.href = uri;
+                            link.click();
+                            document.getElementById("statusMessage").innerText = "Archive complete!";
+                        }).catch((err) => {
+                            document.getElementById("statusMessage").innerText = err;
+                        });
                     }).catch((err) => {
-                        document.getElementById("statusMessage").innerText = err;
+                        document.getElementById("statusMessage").innerText = "No character found!";
                     });
                 });
             }

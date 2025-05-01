@@ -392,3 +392,12 @@ pub async extern "C" fn archive_character_base64(
         .map(|x| BASE64_STANDARD.encode(x))?;
     return Ok(format!("data:application/octet-stream;charset=utf-16le;base64,{buf}").into());
 }
+
+#[cfg(target_family = "wasm")]
+#[wasm_bindgen]
+pub async extern "C" fn search_for_character(name: &str) -> Option<u64> {
+    #[cfg(feature = "debug")]
+    console_error_panic_hook::set_once();
+
+    search_character(name).await
+}
