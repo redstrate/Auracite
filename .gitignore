@@ -6,3 +6,6 @@ obj/
 *.user
 dalamud/Auracite/bin
 *.zip
+auracite.flatpak
+.flatpak-builder/
+export/
