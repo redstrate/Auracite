@@ -157,3 +157,19 @@ jobs:
         run: |
           export CMAKE_PREFIX_PATH=${{ github.workspace }}/prefix/lib/x86_64-linux-gnu/cmake
           cargo clippy
+
+  flatpak:
+    name: "Flatpak"
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: auracite.flatpak
+          manifest-path: .flatpak-manifest.json
+          cache-key: flatpak-builder-${{ github.sha }}
