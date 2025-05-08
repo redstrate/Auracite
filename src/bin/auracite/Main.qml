@@ -59,28 +59,52 @@ Kirigami.ApplicationWindow {
 
                     maximumWidth: Kirigami.Units.gridUnit * 20
 
-                    FormCard.FormTextFieldDelegate {
-                        id: characterNameField
-                        label: i18n("Character Name")
-                        placeholderText: "Full name of the character"
-                        focus: true
+                    FormCard.FormRadioSelectorDelegate {
+                        consistentWidth: true
+                        actions: [
+                            Kirigami.Action {
+                                id: nameAction
+                                text: i18nc("@option:radio", "Name")
+                            },
+                            Kirigami.Action {
+                                id: idAction
+                                text: i18nc("@option:radio", "ID")
+                            }
+                        ]
                     }
 
-                    FormCard.FormDelegateSeparator {}
+                    FormCard.AbstractFormDelegate {
+                        id: inputDelegate
+
+                        contentItem: QQC2.TextField {
+                            id: inputField
+                            placeholderText: nameAction.checked ? i18nc("@info:placeholder", "Character name") : i18nc("@info:placeholder", "Lodestone ID")
+                            focus: true
+                        }
+                    }
+
+                    FormCard.FormDelegateSeparator {
+                        above: inputDelegate
+                        below: dalamudCheckbox
+                    }
 
                     FormCard.FormCheckDelegate {
                         id: dalamudCheckbox
-                        text: i18n("Use Dalamud Plugin")
+                        text: i18n("Connect to the Dalamud Plugin")
                     }
 
-                    FormCard.FormDelegateSeparator {}
+                    FormCard.FormDelegateSeparator {
+                        above: dalamudCheckbox
+                        below: loginButton
+                    }
 
                     FormCard.FormButtonDelegate {
                         id: loginButton
+                        icon.name: "cloud-download-symbolic"
                         text: i18nc("@action:button", "Archive")
-                        enabled: characterNameField.text.length > 0
+                        enabled: inputField.text.length > 0
                         onClicked: {
-                            fileDialog.selectedFile = characterNameField.text;
+                            fileDialog.selectedFile = inputField.text;
                             fileDialog.open();
                         }
                     }
@@ -127,7 +151,11 @@ Kirigami.ApplicationWindow {
             let path = selectedFile.toString();
             // Remove file://
             path = path.replace(/^(file:\/{2})/,"");
-            root.backend.archiveCharacter(characterNameField.text, dalamudCheckbox.checked, path);
+            if (nameAction.checked) {
+                root.backend.archiveCharacterByName(inputField.text, dalamudCheckbox.checked, path);
+            } else {
+                root.backend.archiveCharacterById(inputField.text, dalamudCheckbox.checked, path);
+            }
             root.lastArchiveFile = path;
         }
     }
