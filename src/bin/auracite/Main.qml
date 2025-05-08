@@ -40,6 +40,7 @@ Kirigami.ApplicationWindow {
 
                     position: Kirigami.InlineMessage.Position.Header
                     actions: type === Kirigami.MessageType.Information ? [openArchiveAction] : []
+                    showCloseButton: true
 
                     Layout.fillWidth: true
                 }
@@ -104,6 +105,7 @@ Kirigami.ApplicationWindow {
                         text: i18nc("@action:button", "Archive")
                         enabled: inputField.text.length > 0
                         onClicked: {
+                            messageBanner.visible = false;
                             fileDialog.selectedFile = inputField.text;
                             fileDialog.open();
                         }
