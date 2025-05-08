@@ -67,6 +67,7 @@ fn main() {
     ));
 
     KAboutData::set_application_data(&*about_data);
+    QGuiApplication::set_desktop_file_name(&QString::from("zone.xiv.auracite"));
 
     let mut command_line_parser = QCommandLineParser::default();
     about_data
