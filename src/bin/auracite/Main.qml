@@ -29,6 +29,8 @@ Kirigami.ApplicationWindow {
             globalToolBarStyle: Kirigami.ApplicationHeaderStyle.None
 
             header: ColumnLayout {
+                spacing: 0
+
                 Kirigami.Separator {
                     Layout.fillWidth: true
                 }
@@ -93,7 +95,7 @@ Kirigami.ApplicationWindow {
                         id: aboutButton
                         text: i18nc("@action:button Application settings", "Settings")
                         icon.name: "settings-configure"
-                        onClicked: applicationWindow().pageStack.push(Qt.createComponent("org.kde.kirigamiaddons.formcard", "AboutPage"))
+                        onClicked: applicationWindow().pageStack.layers.push(Qt.createComponent("org.kde.kirigamiaddons.formcard", "AboutPage"))
                     }
                 }
             }
