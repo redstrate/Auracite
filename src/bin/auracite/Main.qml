@@ -55,6 +55,28 @@ Kirigami.ApplicationWindow {
 
                 spacing: Kirigami.Units.largeSpacing
 
+                Item {
+                    Layout.fillHeight: true
+                }
+
+                Image {
+                    source: "qrc:/zone.xiv.auracite.svg"
+
+                    width: 500
+                    height: 500
+                    fillMode: Image.PreserveAspectFit
+
+                    Layout.fillWidth: true
+                    Layout.margins: Kirigami.Units.largeSpacing * 3
+                }
+
+                QQC2.Label {
+                    text: i18nc("@info:label", "Export your FFXIV character into portable, generic formats.")
+                    horizontalAlignment: Text.AlignHCenter
+
+                    Layout.fillWidth: true
+                }
+
                 FormCard.FormCard {
                     Layout.topMargin: Kirigami.Units.largeSpacing
 
@@ -110,6 +132,10 @@ Kirigami.ApplicationWindow {
                             fileDialog.open();
                         }
                     }
+                }
+
+                Item {
+                    Layout.fillHeight: true
                 }
 
                 FormCard.FormCard {
