@@ -23,6 +23,11 @@
       "CARGO_HOME" : "/run/build/auracite/cargo"
     }
   },
+  "cleanup": [
+    "/include",
+    "/lib/cmake",
+    "/share/kdevappwizard"
+  ],
   "modules": [
     {
       "name": "kirigami-addons",
