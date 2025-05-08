@@ -6,6 +6,7 @@
   "sdk": "org.kde.Sdk",
   "command": "auracite",
   "finish-args": [
+    "--share=ipc",
     "--device=dri",
     "--env=QML_IMPORT_PATH=/app/qml",
     "--env=QT_PLUGIN_PATH=/app/plugins:/app/lib64/plugins:/app/lib/plugins:/usr/share/runtime/lib/plugins",
