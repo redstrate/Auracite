@@ -15,17 +15,32 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(AppearanceStep), typeof(CurrencyStep), typeof(MiscStep), typeof(PlaytimeStep), typeof(AdventurerPlateStep), typeof(EndStep)];
+        [typeof(AppearanceStep), typeof(InventoryStep), typeof(MiscStep), typeof(PlaytimeStep), typeof(AdventurerPlateStep), typeof(EndStep)];
 
     private int _stepIndex;
 
     private readonly StepWindow StepWindow;
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class InventoryItem
+    {
+        public int slot;
+        public uint quantity;
+        public int condition;
+        public uint id;
+        public uint glamour_id;
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public class InventoryContainer
+    {
+        public List<InventoryItem> items;
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Package
     {
         public string? playtime;
-        public uint gil;
         public bool is_battle_mentor;
         public bool is_trade_mentor;
         public bool is_novice;
@@ -73,6 +88,29 @@ public sealed class Plugin : IDalamudPlugin
         public string? portrait_frame;
         public string? plate_frame;
         public string? accent;
+
+        // inventory
+        public InventoryContainer inventory1;
+        public InventoryContainer inventory2;
+        public InventoryContainer inventory3;
+        public InventoryContainer inventory4;
+
+        public InventoryContainer equipped_items;
+
+        public InventoryContainer currency;
+
+        public InventoryContainer armory_off_hand;
+        public InventoryContainer armory_head;
+        public InventoryContainer armory_body;
+        public InventoryContainer armory_hands;
+        public InventoryContainer armory_waist;
+        public InventoryContainer armory_legs;
+        public InventoryContainer armory_ear;
+        public InventoryContainer armory_neck;
+        public InventoryContainer armory_wrist;
+        public InventoryContainer armory_rings;
+        public InventoryContainer armory_soul_crystal;
+        public InventoryContainer armory_main_hand;
 
         public int voice;
     }

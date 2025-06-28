@@ -1,9 +1,22 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct InventoryItem {
+    pub slot: i32,
+    pub quantity: u32,
+    pub condition: i32,
+    pub id: u32,
+    pub glamour_id: u32,
+}
+
+#[derive(Default, Deserialize, Serialize, Clone)]
+pub struct InventoryContainer {
+    pub items: Vec<InventoryItem>,
+}
 
 #[derive(Default, Deserialize, Clone)]
 pub struct Package {
     pub playtime: String,
-    pub gil: u32,
     pub is_battle_mentor: bool,
     pub is_trade_mentor: bool,
     pub is_novice: bool,
@@ -52,4 +65,27 @@ pub struct Package {
     pub bust_size: i32,
     pub facepaint: i32,
     pub facepaint_color: i32,
+
+    // inventory
+    pub inventory1: InventoryContainer,
+    pub inventory2: InventoryContainer,
+    pub inventory3: InventoryContainer,
+    pub inventory4: InventoryContainer,
+
+    pub equipped_items: InventoryContainer,
+
+    pub currency: InventoryContainer,
+
+    pub armory_off_hand: InventoryContainer,
+    pub armory_head: InventoryContainer,
+    pub armory_body: InventoryContainer,
+    pub armory_hands: InventoryContainer,
+    pub armory_waist: InventoryContainer,
+    pub armory_legs: InventoryContainer,
+    pub armory_ear: InventoryContainer,
+    pub armory_neck: InventoryContainer,
+    pub armory_wrist: InventoryContainer,
+    pub armory_rings: InventoryContainer,
+    pub armory_soul_crystal: InventoryContainer,
+    pub armory_main_hand: InventoryContainer,
 }

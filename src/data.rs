@@ -1,8 +1,11 @@
 use serde::Serialize;
 
-use crate::value::{
-    CityStateValue, ClassJobValue, GenderValue, GrandCompanyValue, GuardianValue, ItemValue,
-    NamedayValue, RaceValue, TribeValue, WorldValue,
+use crate::{
+    package::InventoryContainer,
+    value::{
+        CityStateValue, ClassJobValue, GenderValue, GrandCompanyValue, GuardianValue, ItemValue,
+        NamedayValue, RaceValue, TribeValue, WorldValue,
+    },
 };
 
 #[derive(Default, Serialize)]
@@ -120,4 +123,45 @@ pub struct CharacterData {
     pub face_url: String,
     #[serde(skip)]
     pub portrait_url: String,
+
+    // inventory
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory1: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory2: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory3: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory4: Option<InventoryContainer>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub equipped_items: Option<InventoryContainer>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub currency: Option<InventoryContainer>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_off_hand: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_head: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_body: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_hands: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_waist: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_legs: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_ear: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_neck: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_wrist: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_rings: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_soul_crystal: Option<InventoryContainer>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub armory_main_hand: Option<InventoryContainer>,
 }

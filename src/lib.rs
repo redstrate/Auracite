@@ -226,10 +226,29 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
             facepaint_color: package.facepaint_color,
         });
 
+        char_data.inventory1 = Some(package.inventory1);
+        char_data.inventory2 = Some(package.inventory2);
+        char_data.inventory3 = Some(package.inventory3);
+        char_data.inventory4 = Some(package.inventory4);
+
+        char_data.equipped_items = Some(package.equipped_items);
+
+        char_data.currency = Some(package.currency);
+
+        char_data.armory_off_hand = Some(package.armory_off_hand);
+        char_data.armory_head = Some(package.armory_head);
+        char_data.armory_body = Some(package.armory_body);
+        char_data.armory_hands = Some(package.armory_hands);
+        char_data.armory_waist = Some(package.armory_waist);
+        char_data.armory_legs = Some(package.armory_legs);
+        char_data.armory_ear = Some(package.armory_ear);
+        char_data.armory_neck = Some(package.armory_neck);
+        char_data.armory_wrist = Some(package.armory_wrist);
+        char_data.armory_rings = Some(package.armory_rings);
+        char_data.armory_soul_crystal = Some(package.armory_soul_crystal);
+        char_data.armory_main_hand = Some(package.armory_main_hand);
+
         char_data.playtime = Some(package.playtime.parse().unwrap());
-        char_data.currencies = Some(Currencies {
-            gil: package.gil, // TODO: also fetch from the lodestone
-        });
         char_data.is_battle_mentor = Some(package.is_battle_mentor);
         char_data.is_trade_mentor = Some(package.is_trade_mentor);
         char_data.is_novice = Some(package.is_novice);
