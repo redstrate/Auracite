@@ -41,15 +41,12 @@ const CHARACTER_BLOCK_NAME_SELECTOR: &str = ".character-block__name";
 const FACE_IMG_SELECTOR: &str = ".frame__chara__face > img";
 const PORTRAIT_IMG_SELECTOR: &str = ".character__detail__image > a > img";
 const NAMEDAY_SELECTOR: &str = ".character-block__birth";
-const CLASSJOB_SELECTOR: &str = ".character__level__list > ul > li";
 const FREE_COMPANY_SELECTOR: &str = ".character__freecompany__name > h4 > a";
 const TITLE_SELECTOR: &str = ".frame__chara__title";
 
 /// Parses the HTML from `data` and returns `CharacterData`. The data may be incomplete.
-pub fn parse_lodestone(data: &str) -> CharacterData {
+pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
     let document = Html::parse_document(data);
-
-    let mut char_data = CharacterData::default();
 
     for element in document.select(&Selector::parse(CHARACTER_NAME_SELECTOR).unwrap()) {
         char_data.name = element.inner_html();
@@ -148,31 +145,6 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
         char_data.portrait_url = element.attr("src").unwrap().parse().unwrap();
     }
 
-    for element in document.select(&Selector::parse(CLASSJOB_SELECTOR).unwrap()) {
-        let img = element.first_child().unwrap();
-        let name = img
-            .value()
-            .as_element()
-            .unwrap()
-            .attr("data-tooltip")
-            .unwrap();
-
-        // ignore "-" and other invalid level values
-        if let Ok(level) = element
-            .last_child()
-            .unwrap()
-            .value()
-            .as_text()
-            .unwrap()
-            .parse::<i32>()
-        {
-            char_data.classjob_levels.push(ClassJobValue {
-                name: name.to_string(),
-                level,
-            });
-        }
-    }
-
     // TODO: support facewear
     let item_slot_selectors = [
         ".icon-c--0",  // Main Hand
@@ -215,8 +187,48 @@ pub fn parse_lodestone(data: &str) -> CharacterData {
             }
         }
     }
+}
 
-    char_data
+const CLASSJOB_SELECTOR: &str = ".character__job > li";
+const CLASSJOB_LEVEL_SELECTOR: &str = ".character__job__level";
+const CLASSJOB_NAME_SELECTOR: &str = ".character__job__name";
+const CLASSJOB_EXP_SELECTOR: &str = ".character__job__exp";
+
+/// Parses the HTML from `data` and returns `CharacterData`. The data may be incomplete.
+pub fn parse_classjob(data: &str, char_data: &mut CharacterData) {
+    let document = Html::parse_document(data);
+
+    for element in document.select(&Selector::parse(CLASSJOB_SELECTOR).unwrap()) {
+        let level = element
+            .select(&Selector::parse(CLASSJOB_LEVEL_SELECTOR).unwrap())
+            .nth(0)
+            .unwrap();
+        let name = element
+            .select(&Selector::parse(CLASSJOB_NAME_SELECTOR).unwrap())
+            .nth(0)
+            .unwrap();
+        let exp_element = element
+            .select(&Selector::parse(CLASSJOB_EXP_SELECTOR).unwrap())
+            .nth(0)
+            .unwrap();
+
+        let mut exp = None;
+        let mut max_exp = None;
+        if let Some((exp_text, max_exp_text)) = exp_element.inner_html().split_once(" / ") {
+            exp = exp_text.replace(",", "").parse().ok();
+            max_exp = max_exp_text.replace(",", "").parse().ok();
+        }
+
+        // skip levels that are -, which means they don't even have the classjob
+        if let Ok(level) = level.inner_html().parse() {
+            let mut class_job_value =
+                ClassJobValue::try_from(name.inner_html().as_str()).unwrap_or_default();
+            class_job_value.level = level;
+            class_job_value.exp = exp;
+            class_job_value.max_exp = max_exp;
+            char_data.classjob_levels.push(class_job_value);
+        }
+    }
 }
 
 fn parse_item_tooltip(element: &scraper::ElementRef<'_>) -> Option<ItemValue> {

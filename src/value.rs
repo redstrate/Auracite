@@ -299,6 +299,72 @@ pub struct ClassJobValue {
     pub name: String,
     /// Level of the class or job.
     pub level: i32,
+    /// The EXP of the job, can be None to indicate either: the job isn't unlocked or that they have max EXP.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exp: Option<i32>,
+    /// The maximum EXP of the job, can be None to indicate either: the job isn't unlocked or that they have max EXP.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_exp: Option<i32>,
+    /// Internal ID of the class or job.
+    pub value: i32,
+}
+
+impl TryFrom<&str> for ClassJobValue {
+    type Error = ArchiveError;
+
+    fn try_from(name: &str) -> Result<Self, ArchiveError> {
+        let value = match name {
+            "Gladiator" => 1,
+            "Pugilist" => 2,
+            "Marauder" => 3,
+            "Lancer" => 4,
+            "Archer" => 5,
+            "Conjurer" => 6,
+            "Thaumaturge" => 7,
+            "Carpenter" => 8,
+            "Blacksmith" => 9,
+            "Armorer" => 10,
+            "Goldsmith" => 11,
+            "Leatherworker" => 12,
+            "Weaver" => 13,
+            "Alchemist" => 14,
+            "Culinarian" => 15,
+            "Miner" => 16,
+            "Botanist" => 17,
+            "Fisher" => 18,
+            "Paladin" => 19,
+            "Monk" => 20,
+            "Warrior" => 21,
+            "Dragoon" => 22,
+            "Bard" => 23,
+            "White Mage" => 24,
+            "Black Mage" => 25,
+            "Arcanist" => 26,
+            "Summoner" => 27,
+            "Scholar" => 28,
+            "Rogue" => 29,
+            "Ninja" => 30,
+            "Machinist" => 31,
+            "Dark Knight" => 32,
+            "Astrologian" => 33,
+            "Samurai" => 34,
+            "Red Mage" => 35,
+            "Blue Mage" => 36,
+            "Gunbreaker" => 37,
+            "Dancer" => 38,
+            "Reaper" => 39,
+            "Sage" => 40,
+            "Viper" => 41,
+            "Pictomancer" => 42,
+            _ => return Err(ArchiveError::ParsingError),
+        };
+
+        Ok(Self {
+            name: name.to_string(),
+            value,
+            ..Default::default()
+        })
+    }
 }
 
 #[derive(Default, Serialize)]

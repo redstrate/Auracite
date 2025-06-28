@@ -12,7 +12,6 @@ use crate::parser::parse_search;
 use base64::prelude::*;
 use data::{Appearance, Currencies};
 use package::Package;
-use physis::race::{Gender, Race, Tribe};
 use physis::savedata::chardat;
 use regex::Regex;
 use reqwest::Url;
@@ -132,7 +131,20 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         .map_err(|_| ArchiveError::DownloadFailed(char_page_url.to_string()))?;
     let char_page = String::from_utf8(char_page).map_err(|_| ArchiveError::ParsingError)?;
 
-    let mut char_data = parser::parse_lodestone(&char_page);
+    let mut char_data = CharacterData::default();
+    parser::parse_profile(&char_page, &mut char_data);
+
+    let classjob_page_url = Url::parse(&format!(
+        "{lodestone_host}/lodestone/character/{}/class_job/",
+        id
+    ))
+    .map_err(|_| ArchiveError::UnknownError)?;
+    let classjob_page = download(&classjob_page_url)
+        .await
+        .map_err(|_| ArchiveError::DownloadFailed(classjob_page_url.to_string()))?;
+    let char_page = String::from_utf8(classjob_page).map_err(|_| ArchiveError::ParsingError)?;
+
+    parser::parse_classjob(&char_page, &mut char_data);
 
     // 2 MiB, for one JSON and two images
     let mut buf = Vec::new();
