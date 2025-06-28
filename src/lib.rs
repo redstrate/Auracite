@@ -13,6 +13,7 @@ use base64::prelude::*;
 use data::{Appearance, Currencies};
 use package::Package;
 use physis::race::{Gender, Race, Tribe};
+use physis::savedata::chardat;
 use regex::Regex;
 use reqwest::Url;
 use serde::Deserialize;
@@ -318,9 +319,9 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
             .try_into()
             .unwrap();
 
-        let char_dat = physis::chardat::CharacterData {
+        let char_dat = chardat::CharacterData {
             version: 7,
-            customize: physis::chardat::CustomizeData {
+            customize: chardat::CustomizeData {
                 race: (package.race as u8).try_into()?,
                 gender: (package.gender as u8).try_into()?,
                 age: package.model_type as u8,
