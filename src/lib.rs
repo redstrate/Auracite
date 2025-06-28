@@ -259,6 +259,8 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         char_data.plate_classjob_level = Some(package.plate_class_job_level);
         char_data.search_comment = Some(package.search_comment);
         char_data.voice = Some(package.voice);
+        char_data.unlock_flags = Some(package.unlock_flags);
+        char_data.unlock_aetherytes = Some(package.unlock_aetherytes);
 
         zip.start_file("plate-portrait.png", options)?;
         zip.write_all(

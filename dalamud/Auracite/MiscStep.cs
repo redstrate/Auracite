@@ -17,6 +17,10 @@ public class MiscStep : IStep
             Plugin.package.is_novice = PlayerState.Instance()->IsNovice();
             Plugin.package.is_returner = PlayerState.Instance()->IsReturner();
             Plugin.package.player_commendations = PlayerState.Instance()->PlayerCommendations;
+            Plugin.package.unlock_flags = new System.Collections.Generic.List<byte>(); // TODO: lol
+            Plugin.package.unlock_flags.AddRange(UIState.Instance()->UnlockLinkBitmask.ToArray());
+            Plugin.package.unlock_aetherytes = new System.Collections.Generic.List<byte>(); // TODO: lol
+            Plugin.package.unlock_aetherytes.AddRange(UIState.Instance()->UnlockedAetherytesBitmask.ToArray());
 
             var localPlayer = Plugin.ClientState.LocalPlayer;
             if (localPlayer != null)

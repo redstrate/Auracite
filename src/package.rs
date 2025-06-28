@@ -88,4 +88,7 @@ pub struct Package {
     pub armory_rings: InventoryContainer,
     pub armory_soul_crystal: InventoryContainer,
     pub armory_main_hand: InventoryContainer,
+
+    pub unlock_flags: Vec<u8>,
+    pub unlock_aetherytes: Vec<u8>,
 }

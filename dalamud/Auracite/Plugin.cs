@@ -113,6 +113,8 @@ public sealed class Plugin : IDalamudPlugin
         public InventoryContainer armory_main_hand;
 
         public int voice;
+        public List<byte> unlock_flags;
+        public List<byte> unlock_aetherytes;
     }
 
     public static Package? package;

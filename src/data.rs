@@ -164,4 +164,9 @@ pub struct CharacterData {
     pub armory_soul_crystal: Option<InventoryContainer>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub armory_main_hand: Option<InventoryContainer>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unlock_flags: Option<Vec<u8>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unlock_aetherytes: Option<Vec<u8>>,
 }
