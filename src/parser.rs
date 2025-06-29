@@ -17,16 +17,14 @@ pub fn parse_search(data: &str) -> String {
     let mut href = String::new();
 
     for element in document.select(&Selector::parse(ENTRY_SELECTOR).unwrap()) {
-        if let Some(block_name) = element
+        if let Some(_) = element
             .select(&Selector::parse(ENTRY_NAME_SELECTOR).unwrap())
-            .nth(0)
-        {
-            if let Some(block_name) = element
+            .next()
+            && let Some(block_name) = element
                 .select(&Selector::parse("a.entry__link").unwrap())
-                .nth(0)
-            {
-                href = block_name.attr("href").unwrap().parse().unwrap();
-            }
+                .next()
+        {
+            href = block_name.attr("href").unwrap().parse().unwrap();
         }
     }
 
@@ -54,34 +52,35 @@ pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
 
     if let Some(title) = document
         .select(&Selector::parse(TITLE_SELECTOR).unwrap())
-        .nth(0)
+        .next()
     {
         char_data.title = Some(title.inner_html().as_str().to_string());
     }
 
+    let world_re = Regex::new(r"(\w+)\s\[(\w+)\]").unwrap();
     for element in document.select(&Selector::parse(WORLD_DATA_CENTER_SELECTOR).unwrap()) {
-        let re = Regex::new(r"(\w+)\s\[(\w+)\]").unwrap();
         let inner_html = element.inner_html();
-        let captures = re.captures(&inner_html).unwrap();
+        let captures = world_re.captures(&inner_html).unwrap();
         // TODO: use error
         char_data.world = WorldValue::try_from(captures.get(1).unwrap().as_str()).unwrap();
         char_data.data_center = captures.get(2).unwrap().as_str().to_owned();
     }
 
+    let block_re = Regex::new(r"([^<]+)<br>([^\/]+)\s\/\s(\W)").unwrap();
+    let grand_re = Regex::new(r"([^\/]+)\s\/\s([^\/]+)").unwrap();
     for element in document.select(&Selector::parse(CHARACTER_BLOCK_SELECTOR).unwrap()) {
         if let Some(block_title) = element
             .select(&Selector::parse(CHARACTER_BLOCK_TITLE_SELECTOR).unwrap())
-            .nth(0)
+            .next()
         {
             let name = block_title.inner_html();
             if name == "Race/Clan/Gender" {
                 if let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
-                    .nth(0)
+                    .next()
                 {
-                    let re = Regex::new(r"([^<]+)<br>([^\/]+)\s\/\s(\W)").unwrap();
                     let inner_html = block_name.inner_html();
-                    let captures = re.captures(&inner_html).unwrap();
+                    let captures = block_re.captures(&inner_html).unwrap();
 
                     char_data.race =
                         RaceValue::try_from(captures.get(1).unwrap().as_str()).unwrap();
@@ -93,7 +92,7 @@ pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
             } else if name == "City-state" {
                 if let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
-                    .nth(0)
+                    .next()
                 {
                     char_data.city_state =
                         CityStateValue::try_from(block_name.inner_html().as_str()).unwrap();
@@ -106,29 +105,27 @@ pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
 
                 if let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
-                    .nth(0)
+                    .next()
                 {
                     char_data.guardian =
                         GuardianValue::try_from(block_name.inner_html().as_str()).unwrap();
                 }
-            } else if name == "Grand Company" {
-                if let Some(block_name) = element
+            } else if name == "Grand Company"
+                && let Some(block_name) = element
                     .select(&Selector::parse(CHARACTER_BLOCK_NAME_SELECTOR).unwrap())
-                    .nth(0)
-                {
-                    let re = Regex::new(r"([^\/]+)\s\/\s([^\/]+)").unwrap();
-                    let inner_html = block_name.inner_html();
-                    let captures = re.captures(&inner_html).unwrap();
+                    .next()
+            {
+                let inner_html = block_name.inner_html();
+                let captures = grand_re.captures(&inner_html).unwrap();
 
-                    char_data.grand_company.name = captures.get(1).unwrap().as_str().to_string();
-                    char_data.grand_company.rank = captures.get(2).unwrap().as_str().to_string();
-                }
+                char_data.grand_company.name = captures.get(1).unwrap().as_str().to_string();
+                char_data.grand_company.rank = captures.get(2).unwrap().as_str().to_string();
             }
         }
 
         if let Some(free_company) = element
             .select(&Selector::parse(FREE_COMPANY_SELECTOR).unwrap())
-            .nth(0)
+            .next()
         {
             char_data.free_company = Some(free_company.inner_html().as_str().to_string());
         }
@@ -138,9 +135,9 @@ pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
         char_data.face_url = element.attr("src").unwrap().parse().unwrap();
     }
 
-    for element in document
+    if let Some(element) = document
         .select(&Selector::parse(PORTRAIT_IMG_SELECTOR).unwrap())
-        .nth(0)
+        .next()
     {
         char_data.portrait_url = element.attr("src").unwrap().parse().unwrap();
     }
@@ -163,28 +160,28 @@ pub fn parse_profile(data: &str, char_data: &mut CharacterData) {
     ];
 
     for (i, selector) in item_slot_selectors.iter().enumerate() {
-        if let Some(slot) = document.select(&Selector::parse(selector).unwrap()).nth(0) {
-            if let Some(item) = slot.select(&Selector::parse(".db-tooltip").unwrap()).nth(0) {
-                let parsed_item = parse_item_tooltip(&item);
-                let slot = match i {
-                    0 => &mut char_data.equipped.main_hand,
-                    1 => &mut char_data.equipped.off_hand,
-                    2 => &mut char_data.equipped.head,
-                    3 => &mut char_data.equipped.body,
-                    4 => &mut char_data.equipped.hands,
-                    5 => &mut char_data.equipped.legs,
-                    6 => &mut char_data.equipped.feet,
-                    7 => &mut char_data.equipped.earrings,
-                    8 => &mut char_data.equipped.necklace,
-                    9 => &mut char_data.equipped.bracelets,
-                    10 => &mut char_data.equipped.left_ring,
-                    11 => &mut char_data.equipped.right_ring,
-                    12 => &mut char_data.equipped.soul_crystal,
-                    _ => panic!("Unexpected slot!"),
-                };
+        if let Some(slot) = document.select(&Selector::parse(selector).unwrap()).next()
+            && let Some(item) = slot.select(&Selector::parse(".db-tooltip").unwrap()).next()
+        {
+            let parsed_item = parse_item_tooltip(&item);
+            let slot = match i {
+                0 => &mut char_data.equipped.main_hand,
+                1 => &mut char_data.equipped.off_hand,
+                2 => &mut char_data.equipped.head,
+                3 => &mut char_data.equipped.body,
+                4 => &mut char_data.equipped.hands,
+                5 => &mut char_data.equipped.legs,
+                6 => &mut char_data.equipped.feet,
+                7 => &mut char_data.equipped.earrings,
+                8 => &mut char_data.equipped.necklace,
+                9 => &mut char_data.equipped.bracelets,
+                10 => &mut char_data.equipped.left_ring,
+                11 => &mut char_data.equipped.right_ring,
+                12 => &mut char_data.equipped.soul_crystal,
+                _ => panic!("Unexpected slot!"),
+            };
 
-                *slot = parsed_item;
-            }
+            *slot = parsed_item;
         }
     }
 }
@@ -201,15 +198,15 @@ pub fn parse_classjob(data: &str, char_data: &mut CharacterData) {
     for element in document.select(&Selector::parse(CLASSJOB_SELECTOR).unwrap()) {
         let level = element
             .select(&Selector::parse(CLASSJOB_LEVEL_SELECTOR).unwrap())
-            .nth(0)
+            .next()
             .unwrap();
         let name = element
             .select(&Selector::parse(CLASSJOB_NAME_SELECTOR).unwrap())
-            .nth(0)
+            .next()
             .unwrap();
         let exp_element = element
             .select(&Selector::parse(CLASSJOB_EXP_SELECTOR).unwrap())
-            .nth(0)
+            .next()
             .unwrap();
 
         let mut exp = None;
@@ -234,7 +231,7 @@ pub fn parse_classjob(data: &str, char_data: &mut CharacterData) {
 fn parse_item_tooltip(element: &scraper::ElementRef<'_>) -> Option<ItemValue> {
     if let Some(slot) = element
         .select(&Selector::parse(".db-tooltip__item__name").unwrap())
-        .nth(0)
+        .next()
     {
         let mut text: String = slot.text().collect();
         if text.contains("\u{e03c}") {

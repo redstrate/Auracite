@@ -27,7 +27,7 @@ serde = { version = "1.0", features = ["derive"], default-features = false }
 regex = { version = "1.11", default-features = false, features = ["unicode-perl"] }
 
 # Used to generate the HTML page to easily preview your exported data
-minijinja = { version = "2.11", default-features = false }
+minijinja = { version = "2.11", features = ["serde"], default-features = false }
 
 # Download files
 reqwest = { version = "0.12" }
@@ -38,7 +38,7 @@ zip = { version = "4.2", default-features = false }
 # Exporting propietary game data
 physis = { git = "https://github.com/redstrate/Physis" }
 
-# Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the c lient
+# Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the client
 base64 = { version = "0.22", default-features = false }
 
 # Not used directly by us, but to disable the "std" feature and is used by the scraper crate.

@@ -10,12 +10,11 @@ use crate::downloader::download;
 use crate::html::{create_character_html, create_plate_html};
 use crate::parser::parse_search;
 use base64::prelude::*;
-use data::{Appearance, Currencies};
+use data::Appearance;
 use package::Package;
 use physis::savedata::chardat;
 use regex::Regex;
 use reqwest::Url;
-use serde::Deserialize;
 use std::io::Write;
 use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(target_family = "wasm")]
@@ -124,7 +123,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         LODESTONE_HOST
     };
 
-    let char_page_url = Url::parse(&format!("{lodestone_host}/lodestone/character/{}/", id))
+    let char_page_url = Url::parse(&format!("{lodestone_host}/lodestone/character/{id}/"))
         .map_err(|_| ArchiveError::UnknownError)?;
     let char_page = download(&char_page_url)
         .await
@@ -135,8 +134,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
     parser::parse_profile(&char_page, &mut char_data);
 
     let classjob_page_url = Url::parse(&format!(
-        "{lodestone_host}/lodestone/character/{}/class_job/",
-        id
+        "{lodestone_host}/lodestone/character/{id}/class_job/"
     ))
     .map_err(|_| ArchiveError::UnknownError)?;
     let classjob_page = download(&classjob_page_url)
@@ -160,14 +158,14 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         } else {
             &char_data.portrait_url
         };
-        let portrait_url = Url::parse(&portrait_url).map_err(|_| ArchiveError::UnknownError)?;
+        let portrait_url = Url::parse(portrait_url).map_err(|_| ArchiveError::UnknownError)?;
 
         let portrait = download(&portrait_url)
             .await
             .map_err(|_| ArchiveError::DownloadFailed(portrait_url.to_string()))?;
 
         zip.start_file("portrait.jpg", options)?;
-        zip.write_all(&*portrait)?;
+        zip.write_all(&portrait)?;
     }
     if !char_data.face_url.is_empty() {
         let face_url = if cfg!(target_family = "wasm") {
@@ -175,26 +173,26 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         } else {
             &char_data.face_url
         };
-        let face_url = Url::parse(&face_url).map_err(|_| ArchiveError::UnknownError)?;
+        let face_url = Url::parse(face_url).map_err(|_| ArchiveError::UnknownError)?;
 
         let face = download(&face_url)
             .await
             .map_err(|_| ArchiveError::DownloadFailed(face_url.to_string()))?;
 
         zip.start_file("face.jpg", options)?;
-        zip.write_all(&*face)?;
+        zip.write_all(&face)?;
     }
 
     if use_dalamud {
-        let dalamud_url = Url::parse(&"http://localhost:42072/package")
-            .map_err(|_| ArchiveError::UnknownError)?;
+        let dalamud_url =
+            Url::parse("http://localhost:42072/package").map_err(|_| ArchiveError::UnknownError)?;
         let package = download(&dalamud_url)
             .await
             .map_err(|_| ArchiveError::CouldNotConnectToDalamud)?;
         let package = String::from_utf8(package).map_err(|_| ArchiveError::ParsingError)?;
         // Remove BOM at the start
         let package = package.trim_start_matches("\u{feff}");
-        let package: Package = serde_json::from_str(&package.trim_start()).unwrap();
+        let package: Package = serde_json::from_str(package.trim_start()).unwrap();
 
         // appearance data
         char_data.appearance = Some(Appearance {
@@ -264,7 +262,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
 
         zip.start_file("plate-portrait.png", options)?;
         zip.write_all(
-            &*BASE64_STANDARD
+            &BASE64_STANDARD
                 .decode(
                     package
                         .portrait
@@ -276,7 +274,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(base_plate) = package.base_plate {
             zip.start_file("base-plate.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(base_plate.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -285,7 +283,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(pattern_overlay) = package.pattern_overlay {
             zip.start_file("pattern-overlay.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(pattern_overlay.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -294,7 +292,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(backing) = package.backing {
             zip.start_file("backing.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(backing.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -303,7 +301,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(top_border) = package.top_border {
             zip.start_file("top-border.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(top_border.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -312,7 +310,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(bottom_border) = package.bottom_border {
             zip.start_file("bottom-border.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(bottom_border.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -321,7 +319,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(portrait_frame) = package.portrait_frame {
             zip.start_file("portrait-frame.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(portrait_frame.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -330,7 +328,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(plate_frame) = package.plate_frame {
             zip.start_file("plate-frame.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(plate_frame.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -339,7 +337,7 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         if let Some(accent) = package.accent {
             zip.start_file("accent.png", options)?;
             zip.write_all(
-                &*BASE64_STANDARD
+                &BASE64_STANDARD
                     .decode(accent.trim_start_matches("data:image/png;base64,"))
                     .unwrap(),
             )?;
@@ -388,11 +386,11 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         };
 
         zip.start_file("FFXIV_CHARA_01.dat", options)?;
-        zip.write_all(&*char_dat.write_to_buffer().unwrap())?;
+        zip.write_all(&char_dat.write_to_buffer().unwrap())?;
 
         // Stop the HTTP server
         let stop_url =
-            Url::parse(&"http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
+            Url::parse("http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
         // I'm intentionally ignoring the message because it doesn't matter if it fails - and it usually does
         let _ = download(&stop_url).await;
     }

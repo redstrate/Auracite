@@ -66,7 +66,7 @@ fn main() {
         &QUrl::from(&QString::from("https://redstrate.com/rss-image.png")),
     ));
 
-    KAboutData::set_application_data(&*about_data);
+    KAboutData::set_application_data(&about_data);
     QGuiApplication::set_desktop_file_name(&QString::from("zone.xiv.auracite"));
 
     let mut command_line_parser = QCommandLineParser::default();
@@ -91,7 +91,7 @@ fn main() {
     command_line_parser.add_option(&dalamud_option);
 
     command_line_parser.process(&QStringList::from(&QList::from(
-        &args().map(|x| QString::from(x)).collect::<Vec<QString>>(),
+        &args().map(QString::from).collect::<Vec<QString>>(),
     )));
     about_data
         .as_mut()
@@ -102,15 +102,16 @@ fn main() {
             .value(&QString::from("name"))
             .to_string();
 
-        println!("Downloading character data for {}...", character_name);
+        println!("Downloading character data for {character_name}...");
 
         let id = search_character_blocking(&character_name).expect("Couldn't find character!");
 
         archive_character_blocking(
             id,
             command_line_parser.is_set(&QString::from("dalamud")),
-            &format!("{}.zip", character_name),
-        );
+            &format!("{character_name}.zip"),
+        )
+        .expect("Failed to archive the requested character!");
 
         return;
     }
@@ -122,13 +123,14 @@ fn main() {
             .parse()
             .expect("Not a valid ID!");
 
-        println!("Downloading character data for {}...", id);
+        println!("Downloading character data for {id}...");
 
         archive_character_blocking(
             id,
             command_line_parser.is_set(&QString::from("dalamud")),
-            &format!("{}.zip", id), // TODO: give it the character's name
-        );
+            &format!("{id}.zip"), // TODO: give it the character's name
+        )
+        .expect("Failed to archive the requested character!");
 
         return;
     }

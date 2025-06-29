@@ -283,7 +283,7 @@ impl TryFrom<&str> for NamedayValue {
 
     fn try_from(value: &str) -> Result<Self, ArchiveError> {
         let re = Regex::new(r"(\d{1,2})[^\d]+(\d{1,2})").unwrap();
-        let captures = re.captures(&value).unwrap();
+        let captures = re.captures(value).unwrap();
 
         Ok(Self {
             value: value.to_string(),

@@ -51,7 +51,7 @@ pub struct BackendRust {}
 
 impl bridge::Backend {
     pub fn archive_character_by_name(
-        mut self: Pin<&mut Self>,
+        self: Pin<&mut Self>,
         character_name: &QString,
         use_dalamud: bool,
         filename: &QString,
@@ -83,7 +83,7 @@ impl bridge::Backend {
     }
 
     pub fn archive_character_by_id(
-        mut self: Pin<&mut Self>,
+        self: Pin<&mut Self>,
         character_id: &QString,
         use_dalamud: bool,
         filename: &QString,
