@@ -8,8 +8,8 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  QT_VERSION: 6.6
-  KF_VERSION: v6.11.0
+  QT_VERSION: 6.8
+  KF_VERSION: v6.15.0
 
 jobs:
   build:
@@ -143,6 +143,13 @@ jobs:
           git clone --depth 1 --branch ${{ env.KF_VERSION }}  https://invent.kde.org/frameworks/kconfigwidgets.git
           cmake -B ${{ steps.strings.outputs.build-output-dir }}-kconfigwidgets -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }}  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S kconfigwidgets -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
           cmake --build ${{ steps.strings.outputs.build-output-dir }}-kconfigwidgets  --target install
+      - name: Build KCMUtils
+        if: steps.cache-prefix-restore.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: |
+          git clone --depth 1 --branch ${{ env.KF_VERSION }}  https://invent.kde.org/frameworks/kcmutils.git
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}-kcmutils -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.prefix-dir }}  -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -S kcmutils -DCMAKE_INSTALL_PREFIX=${{ steps.strings.outputs.prefix-dir }} -DBUILD_TESTING=OFF
+          cmake --build ${{ steps.strings.outputs.build-output-dir }}-kcmutils  --target install
       - name: Save Prefix
         id: cache-prefix-save
         uses: actions/cache/save@v4
