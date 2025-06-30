@@ -17,8 +17,7 @@ cxx-qt-build = { version = "0.7", features = ["link_qt_object_files"], default-f
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-# NOTE: Do not upgrade to 0.21, as it crashes in WebAssembly for some reason. Report this upstream.
-scraper = { version = "0.20" }
+scraper = { version = "0.23" }
 
 # Used to serialize the JSON data we export
 serde = { version = "1.0", features = ["derive"], default-features = false }
@@ -36,7 +35,7 @@ reqwest = { version = "0.12" }
 zip = { version = "4.2", default-features = false }
 
 # Exporting propietary game data
-physis = { git = "https://github.com/redstrate/Physis" }
+physis = { version = "0.4" }
 
 # Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the client
 base64 = { version = "0.22", default-features = false }
@@ -54,7 +53,7 @@ tokio = { version = "1.45", features = ["rt", "macros"], default-features = fals
 
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
-console_error_panic_hook = { version = "0.1.7", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
 
 # to fix some dependency that doesn't enable the feature
 getrandom = { version = "0.3", features = ["wasm_js"] }
