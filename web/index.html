@@ -7,31 +7,56 @@
         <script type="module">
             import init, {archive_character_base64, search_for_character} from "./pkg/auracite.js";
 
-            function archive() {
+            function handle_common_archiving(id, filename) {
+                console.debug("Lodestone id for " + name + ": " + id);
+
+                archive_character_base64(id, document.getElementById("scales").checked).then((uri) => {
+                    console.debug("Archive complete!");
+
+                    // Download character archive
+                    var link = document.createElement('a');
+                    link.download = filename + ".zip";
+                    link.href = uri;
+                    link.click();
+                    document.getElementById("statusMessage").innerText = "Archive complete!";
+                }).catch((err) => {
+                    document.getElementById("statusMessage").innerText = err;
+                });
+            }
+
+            function archive_by_name(name) {
                 init().then(() => {
                     console.debug("Auracite initialized successfully!");
 
-                    let name = document.getElementById("name").value;
-
                     search_for_character(name).then((id) => {
-                        console.debug("Lodestone id for " + name + ": " + id);
-
-                        archive_character_base64(id, document.getElementById("scales").checked).then((uri) => {
-                            console.debug("Archive complete!");
-
-                            // Download character archive
-                            var link = document.createElement('a');
-                            link.download = name + ".zip";
-                            link.href = uri;
-                            link.click();
-                            document.getElementById("statusMessage").innerText = "Archive complete!";
-                        }).catch((err) => {
-                            document.getElementById("statusMessage").innerText = err;
-                        });
+                       handle_common_archiving(id, name);
                     }).catch((err) => {
                         document.getElementById("statusMessage").innerText = "No character found!";
                     });
                 });
+            }
+
+            function archive_by_id(id) {
+                init().then(() => {
+                    console.debug("Auracite initialized successfully!");
+
+                    archive_character_base64(id, document.getElementById("scales").checked).then((uri) => {
+                        handle_common_archiving(id, id);
+                    }).catch((err) => {
+                        document.getElementById("statusMessage").innerText = err;
+                    });
+                });
+            }
+
+            function archive() {
+                let nameInput = document.getElementById("name").value;
+                let idInput = document.getElementById("id").value;
+
+                if (nameInput.length > 0) {
+                    archive_by_name(nameInput);
+                } else {
+                    archive_by_id(idInput);
+                }
             }
 
             document.querySelector('#downloadButton').addEventListener('click', archive);
@@ -93,20 +118,25 @@
     <body>
         <main>
             <div style="text-align:center">
-            <img src="auracite.svg"/>
-            <h1>Auracite</h1>
+                <img src="auracite.svg"/>
+                <h1>Auracite</h1>
+                <p>Auracite allows you to export your FFXIV character into portable, generic formats. Enter your character's name below, and optionally use the Dalamud plugin to collect even more data like your adventurer plate.</p>
+                <label for="name">Character Name:</label>
+                <br>
+                <input type="text" id="name" name="name" required minlength="4" maxlength="20" size="20" placeholder="Sakura Cat" autofocus/>
+                <br>
+                <label for="id">or Lodestone ID:</label>
+                <br>
+                <input type="text" id="id" name="id" placeholder="12345678" autofocus/>
+                <br>
+                <input type="checkbox" id="scales" name="scales"/>
+                <label for="scales">Connect to Dalamud Plugin</label>
+                <br>
+                <button class="favorite styled" type="button" id="downloadButton">Download Archive</button>
+                <br>
+                <p id="statusMessage"></p>
             </div>
-            <p>Auracite allows you to export your FFXIV character into portable, generic formats. Enter your character's name below, and optionally use the Dalamud plugin to export your character's data.</p>
-            <label for="name">Character Name:</label>
-            <br>
-            <input type="text" id="name" name="name" required minlength="4" maxlength="20" size="20" autofocus/>
-            <br>
-            <input type="checkbox" id="scales" name="scales"/>
-            <label for="scales">Connect to Dalamud Plugin</label>
-            <br>
-            <button class="favorite styled" type="button" id="downloadButton">Archive</button>
-            <br>
-            <p id="statusMessage"></p>
+            <hr>
             <details>
                 <p>Auracite uses the <a href="https://na.finalfantasyxiv.com/lodestone">Lodestone</a> for collecting data about your character. However, we can't connect to the
                     Lodestone directly. It uses a proxy which injects CORS compliance and browser compatibility cookies.</p>
@@ -115,6 +145,19 @@
                     collects what is already publicly available on the Lodestone, and optionally data from the game client.</p>
                 <summary>
                     How does this work?
+                </summary>
+            </details>
+            <details>
+                <p>Depending on how much information is collected, lots of things! A snapshot of your character, or perhaps processing it to graph data over time.</p>
+                <p>For a cooler example, I use Auracite in the <a href="https://redstrate.com/shrines/ffxiv">FFXIV shrine on my website</a>.</p>
+                <summary>
+                    What can I use this for?
+                </summary>
+            </details>
+            <details>
+                <p>Auracite can only collect public Lodestone information, so if you have privacy settings preventing that then there's nothing we can do. You will have to switch your profile to public for Auracite to function properly.</p>
+                <summary>
+                    Why doesn't it work/couldn't collect information?
                 </summary>
             </details>
             <details>
