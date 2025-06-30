@@ -388,6 +388,9 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         zip.start_file("FFXIV_CHARA_01.dat", options)?;
         zip.write_all(&char_dat.write_to_buffer().unwrap())?;
 
+        zip.start_file("plate.html", options)?;
+        zip.write_all(create_plate_html(&char_data).as_ref())?;
+
         // Stop the HTTP server
         let stop_url =
             Url::parse("http://localhost:42072/stop").map_err(|_| ArchiveError::UnknownError)?;
@@ -400,9 +403,6 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
 
     zip.start_file("character.html", options)?;
     zip.write_all(create_character_html(&char_data).as_ref())?;
-
-    zip.start_file("plate.html", options)?;
-    zip.write_all(create_plate_html(&char_data).as_ref())?;
 
     zip.finish()?;
 
