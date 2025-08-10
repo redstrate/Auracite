@@ -11,9 +11,13 @@ jobs:
   flatpak:
     name: "Flatpak"
     runs-on: ubuntu-latest
+    # Skip running on PR events that come from the same repository, it will just duplicate the branch action
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
       options: --privileged
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,3 +27,28 @@ jobs:
           bundle: auracite.flatpak
           manifest-path: .flatpak-manifest.json
           cache-key: flatpak-builder-${{ github.sha }}
+
+  build-webassembly:
+    name: "Build (WebAssembly)"
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Add WebAssembly Target
+      run: |
+        rustup target add wasm32-unknown-unknown
+    - uses: actions/cache@v4
+      id: cache-deps
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    - name: Build
+      run: |
+        cargo install wasm-pack
+        ./scripts/build-web.sh
