@@ -1,4 +1,4 @@
-using FFXIVClientStructs.FFXIV.Client.Game;
+using System;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 
@@ -18,11 +18,11 @@ public class MiscStep : IStep
             Plugin.package.is_returner = PlayerState.Instance()->IsReturner();
             Plugin.package.player_commendations = PlayerState.Instance()->PlayerCommendations;
             Plugin.package.unlock_flags = new System.Collections.Generic.List<byte>(); // TODO: lol
-            Plugin.package.unlock_flags.AddRange(UIState.Instance()->UnlockLinkBitmask.ToArray());
+            Plugin.package.unlock_flags.AddRange(new ReadOnlySpan<byte>(UIState.Instance()->UnlockLinksBitArray.Pointer, UIState.Instance()->UnlockLinksBitArray.ByteLength).ToArray());
             Plugin.package.unlock_aetherytes = new System.Collections.Generic.List<byte>(); // TODO: lol
-            Plugin.package.unlock_aetherytes.AddRange(UIState.Instance()->UnlockedAetherytesBitmask.ToArray());
+            Plugin.package.unlock_aetherytes.AddRange(new ReadOnlySpan<byte>(UIState.Instance()->UnlockedAetherytesBitArray.Pointer, UIState.Instance()->UnlockedAetherytesBitArray.ByteLength).ToArray());
 
-            var localPlayer = Plugin.ClientState.LocalPlayer;
+            var localPlayer = Plugin.ObjectTable.LocalPlayer;
             if (localPlayer != null)
             {
                 var gameObject = (Character*)localPlayer.Address;

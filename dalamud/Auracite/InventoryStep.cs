@@ -8,7 +8,7 @@ public class InventoryStep : IStep
 
     public void Run()
     {
-        if (Plugin.ClientState.LocalPlayer != null)
+        if (Plugin.ObjectTable.LocalPlayer != null)
         {
             unsafe
             {

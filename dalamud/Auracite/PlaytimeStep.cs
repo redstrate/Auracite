@@ -1,4 +1,3 @@
-using System;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 

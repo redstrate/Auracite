@@ -134,6 +134,8 @@ public sealed class Plugin : IDalamudPlugin
 
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
 
+    [PluginService] internal static IObjectTable ObjectTable { get; private set; } = null!;
+
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
 
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
