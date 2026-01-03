@@ -28,7 +28,10 @@ jobs:
           ~/.cargo/git/db/
           target/
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-    - name: Build
+    - name: Install wasm-pack
+      if: steps.cache-deps.outputs.cache-hit != 'true'
       run: |
         cargo install wasm-pack
+    - name: Build
+      run: |
         ./scripts/build-web.sh
