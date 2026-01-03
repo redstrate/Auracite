@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file alias="zone.xiv.auracite.svg">../../../zone.xiv.auracite.svg</file>
-    </qresource>
-</RCC>

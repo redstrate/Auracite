@@ -1,1 +1,0 @@
-When Cargo.lock changes, `generated-sources.json` must be updated and that's from https://github.com/flatpak/flatpak-builder-tools/blob/master/cargo/flatpak-cargo-generator.py. 

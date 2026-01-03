@@ -12,9 +12,6 @@ crate-type = ["cdylib", "rlib"]
 [features]
 debug = ["dep:console_error_panic_hook"]
 
-[build-dependencies]
-cxx-qt-build = { version = "0.7", features = ["link_qt_object_files"], default-features = false }
-
 [dependencies]
 # Used to scrape the Lodestone HTML pages
 scraper = { version = "0.24" }
@@ -26,7 +23,7 @@ serde = { version = "1.0", features = ["derive"], default-features = false }
 regex = { version = "1.12", default-features = false, features = ["unicode-perl"] }
 
 # Used to generate the HTML page to easily preview your exported data
-minijinja = { version = "2.12", features = ["serde"], default-features = false }
+minijinja = { version = "2.14", features = ["serde"], default-features = false }
 
 # Download files
 reqwest = { version = "0.12" }
@@ -49,7 +46,7 @@ wasm-bindgen = { version = "0.2", default-features = false }
 wasm-bindgen-futures = { version = "0.4", default-features = false }
 
 # For async
-tokio = { version = "1.48", features = ["rt", "macros"], default-features = false }
+tokio = { version = "1.49", features = ["rt", "macros"], default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 
@@ -61,12 +58,5 @@ getrandom = { version = "0.3", features = ["wasm_js"] }
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # For async
 tokio = { version = "1.48", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
-
-# Used for the Qt UI
-cxx = { version = "1.0", default-features = false }
-cxx-qt = { version = "0.7", default-features = false }
-cxx-qt-lib = { version = "0.7", default-features = false }
-cxx-qt-lib-extras = { version = "0.7", default-features = false }
-cxx-kde-frameworks = { git = "https://invent.kde.org/libraries/cxx-kde-frameworks", branch = "master", default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }

@@ -8,26 +8,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  flatpak:
-    name: "Flatpak"
-    runs-on: ubuntu-latest
-    # Skip running on PR events that come from the same repository, it will just duplicate the branch action
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
-
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
-      options: --privileged
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-        with:
-          bundle: auracite.flatpak
-          manifest-path: .flatpak-manifest.json
-          cache-key: flatpak-builder-${{ github.sha }}
-
   build-webassembly:
     name: "Build (WebAssembly)"
     runs-on: ubuntu-latest
