@@ -1,11 +1,16 @@
 use reqwest::Url;
 
 pub async fn download(url: &Url) -> Result<Vec<u8>, reqwest::Error> {
-    let mut client = reqwest::Client::builder();
+    let client;
+
+    #[cfg(target_family = "wasm")]
+    {
+        client = reqwest::Client::builder();
+    }
 
     #[cfg(not(target_family = "wasm"))]
     {
-        client = client.no_proxy(); // This fixes localhost connections... for some reason (https://github.com/seanmonstar/reqwest/issues/913)
+        client = reqwest::Client::builder().no_proxy(); // This fixes localhost connections... for some reason (https://github.com/seanmonstar/reqwest/issues/913)
     }
 
     let client = client.build()?;
