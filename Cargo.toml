@@ -14,7 +14,7 @@ debug = ["dep:console_error_panic_hook"]
 
 [dependencies]
 # Used to scrape the Lodestone HTML pages
-scraper = { version = "0.24" }
+scraper = { version = "0.25" }
 
 # Used to serialize the JSON data we export
 serde = { version = "1.0", features = ["derive"], default-features = false }
@@ -26,13 +26,13 @@ regex = { version = "1.12", default-features = false, features = ["unicode-perl"
 minijinja = { version = "2.14", features = ["serde"], default-features = false }
 
 # Download files
-reqwest = { version = "0.12" }
+reqwest = { version = "0.13" }
 
 # Zip the character archive
-zip = { version = "6.0", default-features = false }
+zip = { version = "7.0", default-features = false }
 
 # Exporting propietary game data
-physis = { version = "0.4" }
+physis = { version = "0.5" }
 
 # Encoding the character archive to base64 so the browser can download it and decoding the base64 images from the client
 base64 = { version = "0.22", default-features = false }
@@ -57,6 +57,6 @@ getrandom = { version = "0.3", features = ["wasm_js"] }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # For async
-tokio = { version = "1.48", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
+tokio = { version = "1.49", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
 
 serde_json = { version = "1.0", default-features = false, features = ["std"] }
