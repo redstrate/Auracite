@@ -23,13 +23,13 @@ serde = { version = "1.0", features = ["derive"], default-features = false }
 regex = { version = "1.12", default-features = false, features = ["unicode-perl"] }
 
 # Used to generate the HTML page to easily preview your exported data
-minijinja = { version = "2.14", features = ["serde"], default-features = false }
+minijinja = { version = "2.16", features = ["serde"], default-features = false }
 
 # Download files
 reqwest = { version = "0.13" }
 
 # Zip the character archive
-zip = { version = "7.0", default-features = false }
+zip = { version = "8.1", default-features = false }
 
 # Exporting propietary game data
 physis = { version = "0.5" }
