@@ -55,6 +55,9 @@ console_error_panic_hook = { version = "0.1", optional = true }
 # to fix some dependency that doesn't enable the feature
 getrandom = { version = "0.3", features = ["wasm_js"] }
 
+# Because SystemTime doesn't work on Web
+web-time = "1.1"
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 # For async
 tokio = { version = "1.49", features = ["rt", "rt-multi-thread", "macros"], default-features = false }

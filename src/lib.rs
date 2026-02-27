@@ -16,11 +16,11 @@ use physis::savedata::chardat;
 use regex::Regex;
 use reqwest::Url;
 use std::io::Write;
-use std::time::{SystemTime, UNIX_EPOCH};
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::JsValue;
 #[cfg(target_family = "wasm")]
 use wasm_bindgen::prelude::wasm_bindgen;
+use web_time::{SystemTime, UNIX_EPOCH};
 use zip::ZipWriter;
 use zip::result::ZipError;
 use zip::write::SimpleFileOptions;
@@ -144,7 +144,6 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
 
     parser::parse_classjob(&char_page, &mut char_data);
 
-    // 2 MiB, for one JSON and two images
     let mut buf = Vec::new();
     let mut zip = ZipWriter::new(std::io::Cursor::new(&mut buf));
 
@@ -192,7 +191,8 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         let package = String::from_utf8(package).map_err(|_| ArchiveError::ParsingError)?;
         // Remove BOM at the start
         let package = package.trim_start_matches("\u{feff}");
-        let package: Package = serde_json::from_str(package.trim_start()).unwrap();
+        let package: Package =
+            serde_json::from_str(package.trim_start()).map_err(|_| ArchiveError::ParsingError)?;
 
         // appearance data
         char_data.appearance = Some(Appearance {
