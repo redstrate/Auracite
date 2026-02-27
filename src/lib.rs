@@ -252,24 +252,22 @@ pub async fn archive_character(id: u64, use_dalamud: bool) -> Result<Vec<u8>, Ar
         char_data.is_novice = Some(package.is_novice);
         char_data.is_returner = Some(package.is_returner);
         char_data.player_commendations = Some(package.player_commendations); // TODO: fetch from the lodestone?
-        char_data.plate_title = Some(package.plate_title);
-        char_data.plate_classjob = Some(package.plate_class_job);
+        char_data.plate_title = package.plate_title;
+        char_data.plate_classjob = package.plate_class_job;
         char_data.plate_classjob_level = Some(package.plate_class_job_level);
-        char_data.search_comment = Some(package.search_comment);
+        char_data.search_comment = package.search_comment;
         char_data.voice = Some(package.voice);
         char_data.unlock_flags = Some(package.unlock_flags);
         char_data.unlock_aetherytes = Some(package.unlock_aetherytes);
 
-        zip.start_file("plate-portrait.png", options)?;
-        zip.write_all(
-            &BASE64_STANDARD
-                .decode(
-                    package
-                        .portrait
-                        .trim_start_matches("data:image/png;base64,"),
-                )
-                .unwrap(),
-        )?;
+        if let Some(portrait) = package.portrait {
+            zip.start_file("plate-portrait.png", options)?;
+            zip.write_all(
+                &BASE64_STANDARD
+                    .decode(portrait.trim_start_matches("data:image/png;base64,"))
+                    .unwrap(),
+            )?;
+        }
 
         if let Some(base_plate) = package.base_plate {
             zip.start_file("base-plate.png", options)?;
