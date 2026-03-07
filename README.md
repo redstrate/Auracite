@@ -7,43 +7,11 @@ HTML page which you can display in your browser.
 
 ## Usage
 
-### Web
-
-Auracite can run inside your web browser, accessed at [auracite.xiv.zone](https://auracite.xiv.zone/). It works exactly the same as the regular version.
-
-### Desktop
-
-A desktop version is available, just run `cargo run`. There is currently no binary distribution available.
-
-### CLI
-
-Provide a character name via `--name`:
-
-```shell
-auracite --name "John Doe" 
-```
-
-Or provide a Lodestone id:
-
-```shell
-auracite --id 9001
-```
-
-To enable support for the Dalamud plugin, add `--dalamud`.
+Auracite runs inside your web browser, and can be accessed at [auracite.xiv.zone](https://auracite.xiv.zone/).
 
 ## Building
 
-### Desktop
-
-To run the desktop client, simply run `cargo run`. You need the Qt6 development packages installed beforehand.
-
-### Flatpak
-
-To build the Flatpak, use `flatpak-builder` or the helper script `scripts/build-flatpak.sh`. An `auracite.flatpak` file will be generated.
-
-### Web
-
-To build the Web version, use `wasm-pack` or the helper script `scripts/build-web.sh`. A folder called `pkg/` will be generated, and the HTML files live in `web/`.
+Use `wasm-pack` or the helper script `scripts/build-web.sh`. A folder called `pkg/` will be generated, and the HTML files live in `web/`.
 
 ### Dalamud Mode
 
