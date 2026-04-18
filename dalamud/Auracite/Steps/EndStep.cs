@@ -1,8 +1,11 @@
-using System.Text;
+using System.IO;
+using System.IO.Compression;
 using EmbedIO;
 using EmbedIO.Routing;
 using EmbedIO.WebApi;
 using Newtonsoft.Json;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace Auracite;
 
@@ -43,9 +46,28 @@ public class EndStep : IStep
         public void GetPackage()
         {
             Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin,  "*");
-            Response.ContentType = MimeType.Json;
-            using var writer = HttpContext.OpenResponseText(Encoding.UTF8, true);
-            writer.Write(JsonConvert.SerializeObject(Plugin.package));
+            Response.ContentType = "application/zip";
+            using var writer = HttpContext.OpenResponseStream(true);
+
+            using (var archive = new ZipArchive(writer, ZipArchiveMode.Create, true))
+            {
+                using (var entryStream = archive.CreateEntry("character.json").Open())
+                {
+                    using (var streamWriter = new StreamWriter(entryStream))
+                    {
+                        streamWriter.Write(JsonConvert.SerializeObject(Plugin.package, Formatting.Indented));
+                    }
+                }
+
+                WriteImage(archive, Plugin.accent, "accent.png");
+                WriteImage(archive, Plugin.backing, "backing.png");
+                WriteImage(archive, Plugin.base_plate, "base-plate.png");
+                WriteImage(archive, Plugin.pattern_overlay, "pattern-overlay.png");
+                WriteImage(archive, Plugin.plate_frame, "plate-frame.png");
+                WriteImage(archive, Plugin.portrait, "plate-portrait.png");
+                WriteImage(archive, Plugin.top_border, "top-border.png");
+                WriteImage(archive, Plugin.bottom_border, "bottom-border.png");
+            }
         }
     }
     
@@ -76,5 +98,16 @@ public class EndStep : IStep
     public bool IsEnd()
     {
         return true;
+    }
+
+    private static void WriteImage(ZipArchive archive, Image? image, string path)
+    {
+        if (image != null)
+        {
+            using (var entryStream = archive.CreateEntry(path).Open())
+            {
+                image.Save(entryStream, PngFormat.Instance);
+            }
+        }
     }
 }

@@ -97,20 +97,11 @@ public class CharacterJson
     public int voice;
 
     // adventurer plate
-    public string? portrait;
     public string? plate_title;
     public bool? plate_title_is_prefix;
     public string? plate_class_job;
     public int plate_class_job_level;
     public string? search_comment;
-    public string? base_plate;
-    public string? pattern_overlay;
-    public string? backing;
-    public string? top_border;
-    public string? bottom_border;
-    public string? portrait_frame;
-    public string? plate_frame;
-    public string? accent;
 
     public bool is_battle_mentor;
     public bool is_trade_mentor;
