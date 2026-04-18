@@ -91,7 +91,7 @@ public class CharacterJson
     public NameValue race;
     public List<ClassJobLevel> classjob_levels = new List<ClassJobLevel>();
     public NameValue grand_company;
-    public int grand_company_rank; // TODO: introduce as a NameValue
+    public List<byte> grand_company_ranks = new List<byte>(); // TODO: introduce as a NameValue
     public NameValue title;
     public string playtime;
     public int voice;
@@ -135,8 +135,6 @@ public class CharacterJson
     public InventoryContainer armory_soul_crystal;
     public InventoryContainer armory_main_hand;
 
-    // Other stuff useful to Kawari:
-
     // unlocks
     public List<byte> unlocks;
     public List<byte> seen_active_help;
@@ -160,14 +158,14 @@ public class CharacterJson
 
     // aetheryte
     public List<byte> unlocked_aetherytes;
-    public int hoempoint;
+    public int homepoint;
     public List<ushort> favorite_aetherytes;
     public int free_aetheryte;
 
     // classjob
     public int current_class;
     public int first_class;
-    public uint rested_exp;
+    public int rested_exp;
 
     // content
     public List<byte> unlocked_special_content;

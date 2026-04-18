@@ -50,7 +50,9 @@ public class MiscStep : IStep
                 }
             }
             Plugin.package!.grand_company = IStep.SaveNameValue<GrandCompany>(playerState->GrandCompany, company => company.Name);
-            Plugin.package!.grand_company_rank = playerState->GetGrandCompanyRank();
+            Plugin.package!.grand_company_ranks.Add(playerState->GCRankMaelstrom);
+            Plugin.package!.grand_company_ranks.Add(playerState->GCRankTwinAdders);
+            Plugin.package!.grand_company_ranks.Add(playerState->GCRankImmortalFlames);
 
             Plugin.package.is_battle_mentor = PlayerState.Instance()->IsBattleMentor();
             Plugin.package.is_trade_mentor = PlayerState.Instance()->IsTradeMentor();
@@ -87,14 +89,14 @@ public class MiscStep : IStep
 
             // aetherytes
             Plugin.package.unlocked_aetherytes = IStep.ConsumeBitArray(uiState->UnlockedAetherytesBitArray);
-            Plugin.package.hoempoint = playerState->HomeAetheryteId;
+            Plugin.package.homepoint = playerState->HomeAetheryteId;
             Plugin.package.favorite_aetherytes = new List<ushort>(playerState->FavouriteAetherytes.ToArray());
             Plugin.package.free_aetheryte = playerState->FreeAetheryteId;
 
             // classjob
             Plugin.package.current_class = playerState->CurrentClassJobId;
             Plugin.package.first_class = playerState->FirstClass;
-            Plugin.package.rested_exp = playerState->BaseRestedExperience;
+            Plugin.package.rested_exp = (int)playerState->BaseRestedExperience;
 
             // content
             Plugin.package.unlocked_special_content = IStep.ConsumeBitArray(playerState->UnlockedSpecialContentBitArray);
