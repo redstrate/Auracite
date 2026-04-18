@@ -1,8 +1,8 @@
 {
   "Author": "redstrate",
   "Name": "Auracite",
-  "Punchline": "Export your FFXIV character in portable, generic formats",
-  "Description": "Export your FFXIV character in portable, generic formats.",
+  "Punchline": "Archive your FFXIV character in a portable, generic format",
+  "Description": "Archive your FFXIV character in a portable, generic format",
   "Tags": [],
   "RepoUrl": "https://github.com/redstrate/Auracite"
 }

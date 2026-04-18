@@ -123,7 +123,7 @@ public sealed class Plugin : IDalamudPlugin
     {
         CommandManager.AddHandler("/auracite", new CommandInfo(OnAuraciteCommand)
         {
-            HelpMessage = "Start the server."
+            HelpMessage = "Start the archive process."
         });
 
         StepWindow = new StepWindow();
@@ -152,7 +152,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnAuraciteCommand(string command, string arguments)
     {
-        if (arguments == "begin" && CurrentStep == null)
+        if (CurrentStep == null)
         {
             _stepIndex = -1;
             package = new Package();

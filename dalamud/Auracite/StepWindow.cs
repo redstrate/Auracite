@@ -4,21 +4,27 @@ using Dalamud.Bindings.ImGui;
 
 namespace Auracite;
 
-public class StepWindow()
-    : Window("Step Window"), IDisposable
+public class StepWindow : Window, IDisposable
 {
+    public StepWindow() : base("Auracite", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings)
+    {
+        this.ShowCloseButton = false;
+    }
+
     public void Dispose()
     {
+
     }
 
     public override void Draw()
     {
         if (Plugin.CurrentStep != null)
         {
-            ImGui.Text(Plugin.CurrentStep.StepName());
+            ImGui.Text($"Step: {Plugin.CurrentStep.StepName()}");
+            ImGui.Separator();
             ImGui.Text(Plugin.CurrentStep.StepDescription());
 
-            ImGui.TextDisabled("Step requires manual user action.");
+            ImGui.TextDisabled("This step requires manual user action.");
 
             if (ImGui.Button("Retry"))
             {
