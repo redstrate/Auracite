@@ -4,5 +4,6 @@
   "Punchline": "Archive your character in a portable, generic format",
   "Description": "Archive your character in a portable, generic format",
   "Tags": [],
-  "RepoUrl": "https://github.com/redstrate/Auracite"
+  "RepoUrl": "https://github.com/redstrate/Auracite",
+  "IconUrl": "https://raw.githubusercontent.com/redstrate/Auracite/refs/heads/main/images/icon.png"
 }
