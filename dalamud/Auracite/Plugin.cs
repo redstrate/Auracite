@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using SixLabors.ImageSharp;
 
 namespace Auracite;
 
@@ -22,6 +22,15 @@ public sealed class Plugin : IDalamudPlugin
     private readonly StepWindow StepWindow;
 
     public static CharacterJson? package;
+    public static Image? portrait;
+    public static Image? base_plate;
+    public static Image? pattern_overlay;
+    public static Image? backing;
+    public static Image? top_border;
+    public static Image? bottom_border;
+    public static Image? portrait_frame;
+    public static Image? plate_frame;
+    public static Image? accent;
 
     public Plugin()
     {

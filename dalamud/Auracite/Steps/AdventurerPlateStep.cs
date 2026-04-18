@@ -8,7 +8,6 @@ using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace Auracite;
@@ -34,15 +33,13 @@ public class AdventurerPlateStep : IStep
             unsafe
             {
                 var storage = AgentCharaCard.Instance()->Data;
-                var image = GetCurrentCharaViewImage();
-                Plugin.package.portrait = image.ToBase64String(PngFormat.Instance);
+                var image = GetCurrentCharaViewImage();;
 
                 var plateDesign = storage->PlateDesign;
                 
                 if (plateDesign.BasePlate != 0)
                 {
-                    Plugin.package.base_plate = GetImage(ResolveCardBase(plateDesign.BasePlate))
-                        .ToBase64String(PngFormat.Instance);
+                    Plugin.base_plate = GetImage(ResolveCardBase(plateDesign.BasePlate));
                 }
 
                 for (int i = 0; i < plateDesign.NumDecorations; i++)
@@ -58,32 +55,27 @@ public class AdventurerPlateStep : IStep
                     {
                         case AgentCharaCard.DecorationType.PatternOverlay:
                         {
-                            Plugin.package.pattern_overlay = GetImage(ResolveCardDecoration(rowIndex))
-                                .ToBase64String(PngFormat.Instance);
+                            Plugin.pattern_overlay = GetImage(ResolveCardDecoration(rowIndex));
                         }
                             break;
                         case AgentCharaCard.DecorationType.Backing:
                         {
-                            Plugin.package.backing = GetImage(ResolveCardDecoration(rowIndex))
-                                .ToBase64String(PngFormat.Instance);
+                            Plugin.backing = GetImage(ResolveCardDecoration(rowIndex));
                         }
                             break;
                         case AgentCharaCard.DecorationType.PortraitFrame:
                         {
-                            Plugin.package.portrait_frame = GetImage(ResolveCardDecoration(rowIndex))
-                                .ToBase64String(PngFormat.Instance);
+                            Plugin.portrait_frame = GetImage(ResolveCardDecoration(rowIndex));
                         }
                             break;
                         case AgentCharaCard.DecorationType.PlateFrame:
                         {
-                            Plugin.package.plate_frame = GetImage(ResolveCardDecoration(rowIndex))
-                                .ToBase64String(PngFormat.Instance);
+                            Plugin.plate_frame = GetImage(ResolveCardDecoration(rowIndex));
                         }
                             break;
                         case AgentCharaCard.DecorationType.Accent:
                         {
-                            Plugin.package.accent = GetImage(ResolveCardDecoration(rowIndex))
-                                .ToBase64String(PngFormat.Instance);
+                            Plugin.accent = GetImage(ResolveCardDecoration(rowIndex));
                         }
                             break;
                     }
@@ -91,14 +83,12 @@ public class AdventurerPlateStep : IStep
 
                 if (plateDesign.TopBorder != 0)
                 {
-                    Plugin.package.top_border = GetImage(ResolveCardHeaderTop(plateDesign.TopBorder))
-                        .ToBase64String(PngFormat.Instance);
+                    Plugin.top_border = GetImage(ResolveCardHeaderTop(plateDesign.TopBorder));
                 }
 
                 if (plateDesign.BottomBorder != 0)
                 {
-                    Plugin.package.bottom_border = GetImage(ResolveCardHeaderBottom(plateDesign.BottomBorder))
-                        .ToBase64String(PngFormat.Instance);
+                    Plugin.bottom_border = GetImage(ResolveCardHeaderBottom(plateDesign.BottomBorder));
                 }
 
                 Plugin.package.plate_title = Title?.Feminine.ToString(); // TODO: Support mascs
