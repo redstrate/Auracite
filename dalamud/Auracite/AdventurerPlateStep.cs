@@ -209,4 +209,9 @@ public class AdventurerPlateStep : IStep
         var row = Plugin.DataManager.GetExcelSheet<CharaCardHeader>()?.GetRow(rowIndex);
         return $"ui/icon/{row?.BottomImage.ToString().Substring(0, 3)}000/{row?.BottomImage}_hr1.tex";
     }
+
+    public bool NeedsUpdateEveryFrame()
+    {
+        return true; // So we can wait for the window to open.
+    }
 }
