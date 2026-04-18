@@ -1,13 +1,17 @@
 using System;
 using Dalamud.Interface.Windowing;
 using Dalamud.Bindings.ImGui;
+using System.Diagnostics;
 
 namespace Auracite;
 
 public class StepWindow : Window, IDisposable
 {
-    public StepWindow() : base("Auracite", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings)
+    private Plugin plugin;
+
+    public StepWindow(Plugin plugin) : base("Auracite", ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoSavedSettings)
     {
+        this.plugin = plugin;
         this.ShowCloseButton = false;
     }
 
@@ -20,15 +24,30 @@ public class StepWindow : Window, IDisposable
     {
         if (Plugin.CurrentStep != null)
         {
-            ImGui.Text($"Step: {Plugin.CurrentStep.StepName()}");
-            ImGui.Separator();
-            ImGui.Text(Plugin.CurrentStep.StepDescription());
+            if (Plugin.CurrentStep.IsEnd()) {
+                ImGui.Text("Archive created! Please download it below and keep it in a safe place.");
+                ImGui.Text("The plugin can be disabled once you're done using it.");
 
-            ImGui.TextDisabled("This step requires manual user action.");
+                if (ImGui.Button("Download"))
+                {
+                    Process.Start(new ProcessStartInfo { FileName = "http://localhost:42072/download", UseShellExecute = true });
+                }
+                ImGui.SameLine();
+                if (ImGui.Button("Close"))
+                {
+                    plugin.Stop();
+                }
+            } else {
+                ImGui.Text($"Step: {Plugin.CurrentStep.StepName()}");
+                ImGui.Separator();
+                ImGui.Text(Plugin.CurrentStep.StepDescription());
 
-            if (ImGui.Button("Retry"))
-            {
-                Plugin.CurrentStep.Run();
+                ImGui.TextDisabled("This step requires manual user action.");
+
+                if (ImGui.Button("Retry"))
+                {
+                    Plugin.CurrentStep.Run();
+                }
             }
         }
         else

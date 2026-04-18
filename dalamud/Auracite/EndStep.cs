@@ -39,21 +39,13 @@ public class EndStep : IStep
             _endStep = endStep;
         }
         
-        [Route(HttpVerbs.Get, "/package")]
+        [Route(HttpVerbs.Get, "/download")]
         public void GetPackage()
         {
             Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin,  "*");
             Response.ContentType = MimeType.Json;
             using var writer = HttpContext.OpenResponseText(Encoding.UTF8, true);
             writer.Write(JsonConvert.SerializeObject(Plugin.package));
-        }
-        
-        // TODO: Make this a POST request?
-        // This is needed since we don't know when the CORS handshake really stops. This really shouldn't be needed though.
-        [Route(HttpVerbs.Get, "/stop")]
-        public void Stop()
-        {
-            _endStep.End();
         }
     }
     
@@ -79,5 +71,10 @@ public class EndStep : IStep
     public void Dispose()
     {
         ShutdownWebServer();
+    }
+
+    public bool IsEnd()
+    {
+        return true;
     }
 }
