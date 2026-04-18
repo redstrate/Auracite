@@ -10,6 +10,10 @@ public interface IStep : IDisposable
 
     string StepName();
     string StepDescription();
+    bool IsEnd()
+    {
+        return false;
+    }
     
     delegate void CompletedDelegate();
 }

@@ -126,7 +126,7 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Start the archive process."
         });
 
-        StepWindow = new StepWindow();
+        StepWindow = new StepWindow(this);
         WindowSystem.AddWindow(StepWindow);
 
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
@@ -174,5 +174,12 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
         CurrentStep.Run();
+    }
+
+    public void Stop()
+    {
+        CurrentStep = null;
+        StepWindow.IsOpen = false;
+        package = null;
     }
 }
