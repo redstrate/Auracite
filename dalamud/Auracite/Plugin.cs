@@ -15,109 +15,13 @@ public sealed class Plugin : IDalamudPlugin
     private readonly WindowSystem WindowSystem = new("Auracite");
 
     private readonly List<Type> _steps =
-        [typeof(AppearanceStep), typeof(InventoryStep), typeof(MiscStep), typeof(PlaytimeStep), typeof(AdventurerPlateStep), typeof(EndStep)];
+        [typeof(AppearanceStep), typeof(InventoryStep), typeof(MiscStep), typeof(PlaytimeStep), typeof(AdventurerPlateStep), typeof(TitleStep), typeof(EndStep)];
 
     private int _stepIndex;
 
     private readonly StepWindow StepWindow;
 
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class InventoryItem
-    {
-        public int slot;
-        public uint quantity;
-        public int condition;
-        public uint id;
-        public uint glamour_id;
-    }
-
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class InventoryContainer
-    {
-        public List<InventoryItem> items;
-    }
-
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public class Package
-    {
-        public string? playtime;
-        public bool is_battle_mentor;
-        public bool is_trade_mentor;
-        public bool is_novice;
-        public bool is_returner;
-        public short player_commendations;
-        
-        // Appearance
-        public int race;
-        public int gender;
-        public int model_type;
-        public int height;
-        public int tribe;
-        public int face_type;
-        public int hair_style;
-        public bool has_highlights;
-        public int skin_color;
-        public int eye_color;
-        public int hair_color;
-        public int hair_color2;
-        public int face_features;
-        public int face_features_color;
-        public int eyebrows;
-        public int eye_color2;
-        public int eye_shape;
-        public int nose_shape;
-        public int jaw_shape;
-        public int lip_style;
-        public int lip_color;
-        public int race_feature_size;
-        public int race_feature_type;
-        public int bust_size;
-        public int facepaint;
-        public int facepaint_color;
-        public string? portrait;
-        public string? plate_title;
-        public bool? plate_title_is_prefix;
-        public string? plate_class_job;
-        public int plate_class_job_level;
-        public string? search_comment;
-        public string? base_plate;
-        public string? pattern_overlay;
-        public string? backing;
-        public string? top_border;
-        public string? bottom_border;
-        public string? portrait_frame;
-        public string? plate_frame;
-        public string? accent;
-
-        // inventory
-        public InventoryContainer inventory1;
-        public InventoryContainer inventory2;
-        public InventoryContainer inventory3;
-        public InventoryContainer inventory4;
-
-        public InventoryContainer equipped_items;
-
-        public InventoryContainer currency;
-
-        public InventoryContainer armory_off_hand;
-        public InventoryContainer armory_head;
-        public InventoryContainer armory_body;
-        public InventoryContainer armory_hands;
-        public InventoryContainer armory_waist;
-        public InventoryContainer armory_legs;
-        public InventoryContainer armory_ear;
-        public InventoryContainer armory_neck;
-        public InventoryContainer armory_wrist;
-        public InventoryContainer armory_rings;
-        public InventoryContainer armory_soul_crystal;
-        public InventoryContainer armory_main_hand;
-
-        public int voice;
-        public List<byte> unlock_flags;
-        public List<byte> unlock_aetherytes;
-    }
-
-    public static Package? package;
+    public static CharacterJson? package;
 
     public Plugin()
     {
@@ -158,7 +62,7 @@ public sealed class Plugin : IDalamudPlugin
         if (CurrentStep == null)
         {
             _stepIndex = -1;
-            package = new Package();
+            package = new CharacterJson();
             NextStep();
             StepWindow.IsOpen = true;
         }
