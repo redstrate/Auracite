@@ -22,12 +22,12 @@ public class EndStep : IStep
 
     public string StepName()
     {
-        return "Waiting for Upload";
+        return "Save Archive";
     }
 
     public string StepDescription()
     {
-        return "Run Auracite to archive your character.";
+        return "Save your archived character ZIP.";
     }
     
     private class Controller : WebApiController
