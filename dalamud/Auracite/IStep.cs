@@ -14,6 +14,10 @@ public interface IStep : IDisposable
     {
         return false;
     }
+    bool NeedsUpdateEveryFrame()
+    {
+        return false;
+    }
     
     delegate void CompletedDelegate();
 }

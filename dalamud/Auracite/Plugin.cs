@@ -123,13 +123,14 @@ public sealed class Plugin : IDalamudPlugin
     {
         CommandManager.AddHandler("/auracite", new CommandInfo(OnAuraciteCommand)
         {
-            HelpMessage = "Start the archive process."
+            HelpMessage = "Start the archival process."
         });
 
         StepWindow = new StepWindow(this);
         WindowSystem.AddWindow(StepWindow);
 
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
+        Framework.Update += CheckCurrentStep;
     }
 
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
@@ -143,6 +144,8 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ICommandManager CommandManager { get; private set;  } = null!;
     
     [PluginService] internal static IDataManager DataManager { get; private set;  } = null!;
+
+    [PluginService] internal static IFramework Framework { get; private set;  } = null!;
 
     public void Dispose()
     {
@@ -181,5 +184,12 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep = null;
         StepWindow.IsOpen = false;
         package = null;
+    }
+
+    private void CheckCurrentStep(IFramework framework)
+    {
+        if (CurrentStep != null && CurrentStep.NeedsUpdateEveryFrame()) {
+            CurrentStep.Run();
+        }
     }
 }
