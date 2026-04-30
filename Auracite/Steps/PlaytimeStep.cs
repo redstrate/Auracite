@@ -1,3 +1,4 @@
+using Dalamud.Game.Chat;
 using Dalamud.Game.Text;
 using Dalamud.Game.Text.SeStringHandling;
 
@@ -31,11 +32,10 @@ public class PlaytimeStep : IStep
         return "Type /playtime into the chat window.";
     }
     
-    private void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message,
-        ref bool ishandled)
+    private void OnChatMessage(IHandleableChatMessage message)
     {
-        var msgString = message.ToString();
-        if (msgString.Contains("Total Play Time:") && type == XivChatType.SystemMessage)
+        var msgString = message.Message.ToString();
+        if (msgString.Contains("Total Play Time:") && message.LogKind == XivChatType.SystemMessage)
         {
             Plugin.package.playtime = msgString.Split(": ")[1]; // TODO: lol
             Completed?.Invoke();

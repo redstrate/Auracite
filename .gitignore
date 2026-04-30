@@ -4,7 +4,7 @@ config.json
 .vs/
 obj/
 *.user
-dalamud/Auracite/bin
+Auracite/bin
 *.zip
 auracite.flatpak
 .flatpak-builder/

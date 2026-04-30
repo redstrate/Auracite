@@ -24,7 +24,7 @@ public class TitleStep : IStep
             var playerState = PlayerState.Instance();
             if (uiState->TitleList.DataReceived)
             {
-                Plugin.package!.titles = new List<byte>(uiState->TitleList.TitlesUnlockBitmask.ToArray());
+                Plugin.package!.titles = new List<byte>(uiState->TitleList.UnlockedTitles.ToArray());
                 Plugin.package!.title = IStep.SaveNameValue<Title>(((Character*)Plugin.ObjectTable.LocalPlayer!.Address)->TitleId, title => playerState->Sex == 1 ? title.Feminine : title.Masculine);
 
                 Completed?.Invoke();

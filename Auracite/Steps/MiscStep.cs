@@ -50,9 +50,7 @@ public class MiscStep : IStep
                 }
             }
             Plugin.package!.grand_company = IStep.SaveNameValue<GrandCompany>(playerState->GrandCompany, company => company.Name);
-            Plugin.package!.grand_company_ranks.Add(playerState->GCRankMaelstrom);
-            Plugin.package!.grand_company_ranks.Add(playerState->GCRankTwinAdders);
-            Plugin.package!.grand_company_ranks.Add(playerState->GCRankImmortalFlames);
+            Plugin.package!.grand_company_ranks = new List<byte>(playerState->GCRanks.ToArray());
 
             Plugin.package.is_battle_mentor = PlayerState.Instance()->IsBattleMentor();
             Plugin.package.is_trade_mentor = PlayerState.Instance()->IsTradeMentor();
@@ -124,7 +122,7 @@ public class MiscStep : IStep
             Plugin.package.position_y = Plugin.ObjectTable.LocalPlayer.Position.Y;
             Plugin.package.position_z = Plugin.ObjectTable.LocalPlayer.Position.Z;
             Plugin.package.rotation = Plugin.ObjectTable.LocalPlayer.Rotation;
-            Plugin.package.zone_id = Plugin.ClientState.TerritoryType;
+            Plugin.package.zone_id = (ushort)Plugin.ClientState.TerritoryType; // TODO: save as uint
         }
 
         Completed?.Invoke();
