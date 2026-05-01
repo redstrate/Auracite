@@ -33,7 +33,9 @@ public class AdventurerPlateStep : IStep
             unsafe
             {
                 var storage = AgentCharaCard.Instance()->Data;
-                var image = GetCurrentCharaViewImage();;
+                if (storage == null) return;
+                var image = GetCurrentCharaViewImage();
+                if (image == null) return; // texture not ready yet, retry next frame
 
                 var plateDesign = storage->PlateDesign;
                 
@@ -101,9 +103,16 @@ public class AdventurerPlateStep : IStep
         }
     }
     
-    public unsafe Image GetCurrentCharaViewImage()
+    public unsafe Image? GetCurrentCharaViewImage()
     {
-        var texture = CppObject.FromPointer<Texture2D>((nint)AgentCharaCard.Instance()->Data->PortraitTexture->D3D11Texture2D);
+        var data = AgentCharaCard.Instance()->Data;
+        if (data == null) return null;
+        var portraitTexture = data->PortraitTexture;
+        if (portraitTexture == null) return null;
+        var d3d11Texture = portraitTexture->D3D11Texture2D;
+        if (d3d11Texture == null) return null;
+
+        var texture = CppObject.FromPointer<Texture2D>((nint)d3d11Texture);
         var device = (Device5)(IntPtr)FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Device.Instance()->D3D11Forwarder;
         
         // Copy to a CPU-mapped staging texture 
