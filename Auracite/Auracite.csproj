@@ -2,7 +2,7 @@
 <Project Sdk="Dalamud.NET.SDK/15.0.0">
 
     <PropertyGroup>
-        <Version>1.8.0.0</Version>
+        <Version>1.8.0.1</Version>
         <RootNamespace>NeoVARC</RootNamespace>
     </PropertyGroup>
 
