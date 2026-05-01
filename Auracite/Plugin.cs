@@ -94,6 +94,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Stop()
     {
+        CurrentStep?.Dispose();
         CurrentStep = null;
         StepWindow.IsOpen = false;
         package = null;
