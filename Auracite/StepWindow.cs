@@ -26,8 +26,8 @@ public class StepWindow : Window, IDisposable
         {
             if (Plugin.CurrentStep.IsEnd())
             {
-                ImGui.Text("Archive created! Please download it below and keep it in a safe place.");
-                ImGui.Text("The plugin can be disabled once you're done using it.");
+                ImGui.TextWrapped("Archive created! Please download it below and keep it in a safe place.");
+                ImGui.TextWrapped("The plugin can be disabled once you're done using it.");
 
                 if (ImGui.Button("Download"))
                 {
@@ -41,9 +41,9 @@ public class StepWindow : Window, IDisposable
             }
             else
             {
-                ImGui.Text($"Step: {Plugin.CurrentStep.StepName()}");
+                ImGui.TextWrapped($"Step: {Plugin.CurrentStep.StepName()}");
                 ImGui.Separator();
-                ImGui.Text(Plugin.CurrentStep.StepDescription());
+                ImGui.TextWrapped(Plugin.CurrentStep.StepDescription());
 
                 ImGui.TextDisabled("This step requires manual user action.");
 
@@ -55,7 +55,7 @@ public class StepWindow : Window, IDisposable
         }
         else
         {
-            ImGui.Text("Auracite is not running.");
+            ImGui.TextWrapped("Auracite is not running.");
         }
     }
 }
