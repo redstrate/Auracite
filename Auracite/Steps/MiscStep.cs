@@ -22,13 +22,9 @@ public class MiscStep : IStep
             Plugin.package!.world = IStep.SaveNameValue<World>(Plugin.ObjectTable.LocalPlayer!.HomeWorld.RowId, world => world.Name);
             Plugin.package!.data_center = IStep.SaveNameValue<WorldDCGroupType>(Plugin.ObjectTable.LocalPlayer!.HomeWorld.Value.DataCenter.RowId, data_center => data_center.Name);
             Plugin.package!.city_state = IStep.SaveNameValue<Town>(playerState->StartTown, town => town.Name);
-            Plugin.package!.nameday = new DayMonthValue();
-            Plugin.package!.nameday.day = playerState->BirthDay;
-            Plugin.package!.nameday.month = playerState->BirthMonth;
+            Plugin.package!.nameday = new DayMonthValue { day = playerState->BirthDay, month = playerState->BirthMonth };
             Plugin.package!.guardian = IStep.SaveNameValue<GuardianDeity>(playerState->GuardianDeity, guardian => guardian.Name);
-            Plugin.package!.gender = new NameValue();
-            Plugin.package!.gender.value = playerState->Sex;
-            Plugin.package!.gender.name = playerState->Sex == 1 ? "Female" : "Male";
+            Plugin.package!.gender = new NameValue { name = playerState->Sex == 1 ? "Female" : "Male", value = playerState->Sex };
             Plugin.package!.tribe = IStep.SaveNameValue<Tribe>(playerState->Tribe, tribe => playerState->Sex == 1 ? tribe.Feminine : tribe.Masculine);
             Plugin.package!.race = IStep.SaveNameValue<Race>(playerState->Race, race => playerState->Sex == 1 ? race.Feminine : race.Masculine);
             var classJobSheet = Plugin.DataManager.GetExcelSheet<ClassJob>()!;

@@ -42,7 +42,6 @@ public class InventoryStep : IStep
 
     private unsafe Auracite.InventoryContainer ProcessContainer(FFXIVClientStructs.FFXIV.Client.Game.InventoryContainer *container) {
         var serializedContainer = new Auracite.InventoryContainer();
-        serializedContainer.items = new System.Collections.Generic.List<InventoryItem>(); // TODO: lol
 
         for (int i = 0; i < container->Size; i++) {
             var item = container->GetInventorySlot(i);

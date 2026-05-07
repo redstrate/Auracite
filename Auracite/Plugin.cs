@@ -21,7 +21,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private readonly StepWindow StepWindow;
 
-    public static CharacterJson? package;
+    public static CharacterJson package = new CharacterJson();
     public static Image? portrait;
     public static Image? base_plate;
     public static Image? pattern_overlay;
@@ -97,7 +97,6 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep?.Dispose();
         CurrentStep = null;
         StepWindow.IsOpen = false;
-        package = null;
     }
 
     private void CheckCurrentStep(IFramework framework)

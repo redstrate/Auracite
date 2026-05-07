@@ -14,21 +14,21 @@ public class InventoryItem
     public ushort condition;
     public ushort spiritbond_or_collectability;
     public uint glamour_id;
-    public List<ushort> materia;
-    public List<byte> materia_grades;
-    public List<byte> stains;
+    public List<ushort> materia = new List<ushort>();
+    public List<byte> materia_grades = new List<byte>();
+    public List<byte> stains = new List<byte>();
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class InventoryContainer
 {
-    public List<InventoryItem> items;
+    public List<InventoryItem> items = new List<InventoryItem>();
 }
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class NameValue
 {
-    public string name;
+    public string? name;
     public uint value;
 }
 
@@ -43,7 +43,7 @@ public class DayMonthValue
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class ClassJobLevel
 {
-    public string name;
+    public string? name;
     public int level;
     public int exp;
     public uint value;
@@ -80,20 +80,20 @@ public class Appearance
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class CharacterJson
 {
-    public string name;
-    public NameValue world;
-    public NameValue data_center;
-    public NameValue city_state;
-    public DayMonthValue nameday;
-    public NameValue guardian;
-    public NameValue gender;
-    public NameValue tribe;
-    public NameValue race;
+    public string? name;
+    public NameValue? world;
+    public NameValue? data_center;
+    public NameValue? city_state;
+    public DayMonthValue? nameday;
+    public NameValue? guardian;
+    public NameValue? gender;
+    public NameValue? tribe;
+    public NameValue? race;
     public List<ClassJobLevel> classjob_levels = new List<ClassJobLevel>();
-    public NameValue grand_company;
+    public NameValue? grand_company;
     public List<byte> grand_company_ranks = new List<byte>(); // TODO: introduce as a NameValue
-    public NameValue title;
-    public string playtime;
+    public NameValue? title;
+    public string? playtime;
     public int voice;
 
     // adventurer plate
@@ -113,53 +113,53 @@ public class CharacterJson
     public Appearance appearance = new Appearance();
 
     // inventory
-    public InventoryContainer inventory1;
-    public InventoryContainer inventory2;
-    public InventoryContainer inventory3;
-    public InventoryContainer inventory4;
+    public InventoryContainer? inventory1;
+    public InventoryContainer? inventory2;
+    public InventoryContainer? inventory3;
+    public InventoryContainer? inventory4;
 
-    public InventoryContainer equipped;
+    public InventoryContainer? equipped;
 
-    public InventoryContainer currency;
+    public InventoryContainer? currency;
 
-    public InventoryContainer armory_off_hand;
-    public InventoryContainer armory_head;
-    public InventoryContainer armory_body;
-    public InventoryContainer armory_hands;
-    public InventoryContainer armory_waist;
-    public InventoryContainer armory_legs;
-    public InventoryContainer armory_ear;
-    public InventoryContainer armory_neck;
-    public InventoryContainer armory_wrist;
-    public InventoryContainer armory_rings;
-    public InventoryContainer armory_soul_crystal;
-    public InventoryContainer armory_main_hand;
+    public InventoryContainer? armory_off_hand;
+    public InventoryContainer? armory_head;
+    public InventoryContainer? armory_body;
+    public InventoryContainer? armory_hands;
+    public InventoryContainer? armory_waist;
+    public InventoryContainer? armory_legs;
+    public InventoryContainer? armory_ear;
+    public InventoryContainer? armory_neck;
+    public InventoryContainer? armory_wrist;
+    public InventoryContainer? armory_rings;
+    public InventoryContainer? armory_soul_crystal;
+    public InventoryContainer? armory_main_hand;
 
     // unlocks
-    public List<byte> unlocks;
-    public List<byte> seen_active_help;
-    public List<byte> minions;
-    public List<byte> mounts;
-    public List<byte> orchestrion_rolls;
-    public List<byte> cutscene_seen;
-    public List<byte> ornaments;
-    public List<byte> caught_fish;
-    public List<byte> caught_spearfish;
-    public List<byte> adventures;
-    public List<byte> triple_triad_cards;
-    public List<byte> glasses_styles;
-    public List<byte> chocobo_taxi_stands;
-    public List<byte> titles;
-    public List<byte> unlocked_companion_equip;
+    public List<byte> unlocks = new List<byte>();
+    public List<byte> seen_active_help = new List<byte>();
+    public List<byte> minions = new List<byte>();
+    public List<byte> mounts = new List<byte>();
+    public List<byte> orchestrion_rolls = new List<byte>();
+    public List<byte> cutscene_seen = new List<byte>();
+    public List<byte> ornaments = new List<byte>();
+    public List<byte> caught_fish = new List<byte>();
+    public List<byte> caught_spearfish = new List<byte>();
+    public List<byte> adventures = new List<byte>();
+    public List<byte> triple_triad_cards = new List<byte>();
+    public List<byte> glasses_styles = new List<byte>();
+    public List<byte> chocobo_taxi_stands = new List<byte>();
+    public List<byte> titles = new List<byte>();
+    public List<byte> unlocked_companion_equip = new List<byte>();
 
     // aether currents
-    public List<byte> comp_flg_set;
-    public List<byte> unlocked_aether_currents;
+    public List<byte> comp_flg_set = new List<byte>();
+    public List<byte> unlocked_aether_currents = new List<byte>();
 
     // aetheryte
-    public List<byte> unlocked_aetherytes;
+    public List<byte> unlocked_aetherytes = new List<byte>();
     public int homepoint;
-    public List<ushort> favorite_aetherytes;
+    public List<ushort> favorite_aetherytes = new List<ushort>();
     public int free_aetheryte;
 
     // classjob
@@ -168,25 +168,25 @@ public class CharacterJson
     public int rested_exp;
 
     // content
-    public List<byte> unlocked_special_content;
-    public List<byte> unlocked_raids;
-    public List<byte> unlocked_dungeons;
-    public List<byte> unlocked_guildhests;
-    public List<byte> unlocked_trials;
-    public List<byte> unlocked_crystalline_conflicts;
-    public List<byte> unlocked_frontlines;
-    public List<byte> cleared_raids;
-    public List<byte> cleared_dungeons;
-    public List<byte> cleared_guildhests;
-    public List<byte> cleared_trials;
-    public List<byte> cleared_crystalline_conflicts;
-    public List<byte> cleared_frontlines;
-    public List<byte> cleared_masked_carnivale;
-    public List<byte> unlocked_misc_content;
-    public List<byte> cleared_misc_content;
+    public List<byte> unlocked_special_content = new List<byte>();
+    public List<byte> unlocked_raids = new List<byte>();
+    public List<byte> unlocked_dungeons = new List<byte>();
+    public List<byte> unlocked_guildhests = new List<byte>();
+    public List<byte> unlocked_trials = new List<byte>();
+    public List<byte> unlocked_crystalline_conflicts = new List<byte>();
+    public List<byte> unlocked_frontlines = new List<byte>();
+    public List<byte> cleared_raids = new List<byte>();
+    public List<byte> cleared_dungeons = new List<byte>();
+    public List<byte> cleared_guildhests = new List<byte>();
+    public List<byte> cleared_trials = new List<byte>();
+    public List<byte> cleared_crystalline_conflicts = new List<byte>();
+    public List<byte> cleared_frontlines = new List<byte>();
+    public List<byte> cleared_masked_carnivale = new List<byte>();
+    public List<byte> unlocked_misc_content = new List<byte>();
+    public List<byte> cleared_misc_content = new List<byte>();
 
     // quest
-    public List<byte> completed_quests;
+    public List<byte> completed_quests = new List<byte>();
 
     // volatile
     public float position_x;

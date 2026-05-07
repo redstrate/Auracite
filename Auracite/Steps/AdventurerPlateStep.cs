@@ -52,32 +52,37 @@ public class AdventurerPlateStep : IStep
                     {
                         continue;
                     }
+
+                    var path = ResolveCardDecoration(rowIndex);
+                    if (path == null) {
+                        continue;
+                    }
                     
                     switch (decoration.Type)
                     {
                         case AgentCharaCard.DecorationType.PatternOverlay:
                         {
-                            Plugin.pattern_overlay = GetImage(ResolveCardDecoration(rowIndex));
+                            Plugin.pattern_overlay = GetImage(path);
                         }
                             break;
                         case AgentCharaCard.DecorationType.Backing:
                         {
-                            Plugin.backing = GetImage(ResolveCardDecoration(rowIndex));
+                            Plugin.backing = GetImage(path);
                         }
                             break;
                         case AgentCharaCard.DecorationType.PortraitFrame:
                         {
-                            Plugin.portrait_frame = GetImage(ResolveCardDecoration(rowIndex));
+                            Plugin.portrait_frame = GetImage(path);
                         }
                             break;
                         case AgentCharaCard.DecorationType.PlateFrame:
                         {
-                            Plugin.plate_frame = GetImage(ResolveCardDecoration(rowIndex));
+                            Plugin.plate_frame = GetImage(path);
                         }
                             break;
                         case AgentCharaCard.DecorationType.Accent:
                         {
-                            Plugin.accent = GetImage(ResolveCardDecoration(rowIndex));
+                            Plugin.accent = GetImage(path);
                         }
                             break;
                     }
@@ -85,12 +90,18 @@ public class AdventurerPlateStep : IStep
 
                 if (plateDesign.TopBorder != 0)
                 {
-                    Plugin.top_border = GetImage(ResolveCardHeaderTop(plateDesign.TopBorder));
+                    var path = ResolveCardHeaderTop(plateDesign.TopBorder);
+                    if (path != null) {
+                        Plugin.top_border = GetImage(path);
+                    }
                 }
 
                 if (plateDesign.BottomBorder != 0)
                 {
-                    Plugin.bottom_border = GetImage(ResolveCardHeaderBottom(plateDesign.BottomBorder));
+                    var path = ResolveCardHeaderBottom(plateDesign.BottomBorder);
+                    if (path != null) {
+                        Plugin.bottom_border = GetImage(path);
+                    }
                 }
 
                 Plugin.package.plate_title = Title?.Feminine.ToString(); // TODO: Support mascs
@@ -144,9 +155,12 @@ public class AdventurerPlateStep : IStep
         return Image.LoadPixelData<Bgra32>(pixelDataStream.ToArray(), desc.Width, desc.Height);
     }
 
-    public Image GetImage(string path)
+    public Image? GetImage(string path)
     {
         var tex = Plugin.DataManager.GetFile<TexFile>(path);
+        if (tex == null) {
+            return null;
+        }
         tex.LoadFile();
         var imageData = tex.GetRgbaImageData();
         return Image.LoadPixelData<Rgba32>(imageData, tex.Header.Width, tex.Header.Height);

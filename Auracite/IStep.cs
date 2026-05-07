@@ -26,14 +26,13 @@ public interface IStep : IDisposable
     delegate void CompletedDelegate();
 
     public static NameValue SaveNameValue<T>(uint key, Func<T, ReadOnlySeString> fieldSelector) where T : struct, IExcelRow<T> {
-        var newValue = new NameValue();
         var row = Plugin.DataManager.GetExcelSheet<T>()?.GetRow(key);
+        string? name = null;
         if (row != null) {
-            newValue.name = fieldSelector(row.Value).ToString();
+            name = fieldSelector(row.Value).ToString();
         }
-        newValue.value = key;
 
-        return newValue;
+        return new NameValue { name = name, value = key };
     }
 
     public static unsafe List<byte> ConsumeBitArray(BitArray array) {
