@@ -30,6 +30,7 @@ public class AdventurerPlateStep : IStep
                 if (storage == null) return;
                 var image = GetCurrentCharaViewImage(storage);
                 if (image == null) return; // texture not ready yet, retry next frame
+                Plugin.portrait = image;
 
                 var plateDesign = storage->PlateDesign;
 
@@ -239,7 +240,7 @@ public class AdventurerPlateStep : IStep
         return $"ui/icon/{row?.BottomImage.ToString().Substring(0, 3)}000/{row?.BottomImage}_hr1.tex";
     }
 
-    bool RequiresManualConfirmation()
+    public bool RequiresManualConfirmation()
     {
         return true;
     }
