@@ -104,7 +104,7 @@ public class CharacterJson
     public NameValue? grand_company;
     public List<byte> grand_company_ranks = new List<byte>(); // TODO: introduce as a NameValue
     public NameValue? title;
-    public string? playtime;
+    public uint? playtime;
     public int voice;
 
     // adventurer plate

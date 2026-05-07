@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Timers;
 using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
@@ -59,6 +58,10 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
 
     [PluginService] internal static IFramework Framework { get; private set; } = null!;
+
+    [PluginService] internal static IPluginLog PluginLog { get; private set; } = null!;
+
+    [PluginService] internal static IGameInteropProvider Hooking { get; private set; } = null!;
 
     public void Dispose()
     {

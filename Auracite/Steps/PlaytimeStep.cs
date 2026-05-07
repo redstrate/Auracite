@@ -1,19 +1,25 @@
-using System;
-using Dalamud.Game.Chat;
-using Dalamud.Game.Text;
+using System.Runtime.InteropServices;
+using Dalamud.Hooking;
+using FFXIVClientStructs.FFXIV.Client.UI;
 
 namespace Auracite;
 
 public class PlaytimeStep : IStep
 {
+    private readonly Hook<UIModule.Delegates.HandlePacket>? handlePacketHook = null!;
+
     public PlaytimeStep()
     {
-        Plugin.ChatGui.ChatMessage += OnChatMessage;
+        unsafe
+        {
+            handlePacketHook = Plugin.Hooking.HookFromAddress<UIModule.Delegates.HandlePacket>((nint)UIModule.StaticVirtualTablePointer->HandlePacket, HandlePacket);
+        }
+        handlePacketHook?.Enable();
     }
 
     public void Dispose()
     {
-        Plugin.ChatGui.ChatMessage -= OnChatMessage;
+        handlePacketHook?.Dispose();
     }
 
     public event IStep.CompletedDelegate? Completed;
@@ -32,41 +38,14 @@ public class PlaytimeStep : IStep
         return "Type /playtime into the chat window.";
     }
 
-    // Verbatim prefixes from LogMessage row 859 in the four supported client
-    // languages. Any whitespace or colon between the prefix and the value is
-    // stripped at extraction time so the same code path handles all four.
-    private static readonly string[] PlaytimeMarkers =
+    private unsafe void HandlePacket(UIModule* thisPtr, UIModulePacketType type, uint uintParam, void* packet)
     {
-        "Total Play Time",      // EN
-        "Temps de jeu total",   // FR
-        "Gesamtspielzeit",      // DE
-        "累積プレイ時間",         // JP — note: no colon between prefix and value
-    };
-
-    private static readonly char[] MarkerSeparators =
-    {
-        ':',        // EN, DE
-        ' ',        // ASCII space
-        ' ',   // NBSP — appears before the colon in FR
-        '　',   // ideographic space — possible in JP
-    };
-
-    private void OnChatMessage(IHandleableChatMessage message)
-    {
-        if (message.LogKind != XivChatType.SystemMessage) return;
-        var msgString = message.Message.ToString();
-
-        foreach (var marker in PlaytimeMarkers)
+        if (type == UIModulePacketType.PrintPlayTime)
         {
-            var markerIdx = msgString.IndexOf(marker, StringComparison.Ordinal);
-            if (markerIdx < 0) continue;
+            var minutes = (uint)Marshal.ReadInt32((nint)packet + 0x10);
+            Plugin.package.playtime = minutes;
 
-            var rest = msgString[(markerIdx + marker.Length)..]
-                .TrimStart(MarkerSeparators)
-                .TrimEnd();
-            Plugin.package.playtime = rest;
             Completed?.Invoke();
-            return;
         }
     }
 }
