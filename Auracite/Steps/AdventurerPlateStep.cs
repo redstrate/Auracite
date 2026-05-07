@@ -204,7 +204,7 @@ public class AdventurerPlateStep : IStep
 
     private static unsafe bool IsInPlateWindow()
     {
-        return AgentCharaCard.Instance()->AgentInterface.IsAgentActive();
+        return AgentCharaCard.Instance()->AgentInterface.IsAgentActive() && AgentCharaCard.Instance()->AgentInterface.IsAddonShown();
     }
 
     public string ResolveCardBase(uint rowIndex)
