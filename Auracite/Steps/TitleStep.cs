@@ -42,9 +42,4 @@ public class TitleStep : IStep
     {
         return "Open the title list.";
     }
-
-    public bool NeedsUpdateEveryFrame()
-    {
-        return true; // So we can wait for the title window to open.
-    }
 }

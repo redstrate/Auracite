@@ -44,12 +44,6 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.AddWindow(StepWindow);
 
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
-        Framework.Update += CheckCurrentStep;
-
-        frameworkUpdateTimer = new Timer(2000); // Wait 2 seconds between checks to not exhaust Framework.Tick
-        frameworkUpdateTimer.Enabled = true;
-        frameworkUpdateTimer.AutoReset = false;
-        frameworkUpdateTimer.Elapsed += Elapsed;
     }
 
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
@@ -65,9 +59,6 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
 
     [PluginService] internal static IFramework Framework { get; private set; } = null!;
-
-    private Timer frameworkUpdateTimer;
-    private bool frameworkUpdateTimerElapsed = false;
 
     public void Dispose()
     {
@@ -99,10 +90,6 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
         CurrentStep.Run();
-
-        // Reset timer
-        frameworkUpdateTimer.Start();
-        frameworkUpdateTimerElapsed = false;
     }
 
     public void Stop()
@@ -110,25 +97,5 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep?.Dispose();
         CurrentStep = null;
         StepWindow.IsOpen = false;
-    }
-
-    private void CheckCurrentStep(IFramework framework)
-    {
-        if (CurrentStep != null && CurrentStep.NeedsUpdateEveryFrame())
-        {
-            if (frameworkUpdateTimerElapsed)
-            {
-                CurrentStep.Run();
-
-                // Restart timer
-                frameworkUpdateTimer.Start();
-                frameworkUpdateTimerElapsed = false;
-            }
-        }
-    }
-
-    private void Elapsed(Object? source, System.Timers.ElapsedEventArgs e)
-    {
-        frameworkUpdateTimerElapsed = true;
     }
 }

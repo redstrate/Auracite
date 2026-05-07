@@ -46,6 +46,11 @@ public class StepWindow : Window, IDisposable
                 ImGui.Text(Plugin.CurrentStep.StepDescription());
 
                 ImGui.TextDisabled("This step requires manual user action.");
+
+                if (ImGui.Button("Try Again"))
+                {
+                    Plugin.CurrentStep.Run();
+                }
             }
         }
         else
