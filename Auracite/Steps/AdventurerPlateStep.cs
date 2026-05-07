@@ -1,14 +1,13 @@
 using System;
-using System.IO;
 using Dalamud.Utility;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Data.Files;
 using Lumina.Excel.Sheets;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using static FFXIVClientStructs.FFXIV.Client.UI.Agent.AgentCharaCard;
+using TerraFX.Interop.DirectX;
+using System.Runtime.CompilerServices;
 
 namespace Auracite;
 
@@ -34,7 +33,7 @@ public class AdventurerPlateStep : IStep
             {
                 var storage = AgentCharaCard.Instance()->Data;
                 if (storage == null) return;
-                var image = GetCurrentCharaViewImage();
+                var image = GetCurrentCharaViewImage(storage);
                 if (image == null) return; // texture not ready yet, retry next frame
 
                 var plateDesign = storage->PlateDesign;
@@ -118,45 +117,58 @@ public class AdventurerPlateStep : IStep
         }
     }
 
-    public unsafe Image? GetCurrentCharaViewImage()
+    public unsafe Image? GetCurrentCharaViewImage(Storage *storage)
     {
-        var data = AgentCharaCard.Instance()->Data;
-        if (data == null) return null;
-        var portraitTexture = data->PortraitTexture;
+        var portraitTexture = storage->PortraitTexture;
         if (portraitTexture == null) return null;
-        var d3d11Texture = portraitTexture->D3D11Texture2D;
-        if (d3d11Texture == null) return null;
+        var texture = (ID3D11Texture2D*)portraitTexture->D3D11Texture2D;
+        if (texture == null) return null;
 
-        var texture = CppObject.FromPointer<Texture2D>((nint)d3d11Texture);
-        var device = (Device5)(IntPtr)FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Device.Instance()->D3D11Forwarder;
+        var device = (ID3D11Device*)Plugin.PluginInterface.UiBuilder.DeviceHandle;
 
-        // Copy to a CPU-mapped staging texture 
-        var desc = texture.Description;
+        D3D11_TEXTURE2D_DESC desc;
+        texture->GetDesc(&desc);
 
-        using var stagingTexture = new Texture2D(device, new Texture2DDescription()
+        desc.BindFlags = 0;
+        desc.CPUAccessFlags = (uint)D3D11_CPU_ACCESS_FLAG.D3D11_CPU_ACCESS_READ;
+        desc.Usage = D3D11_USAGE.D3D11_USAGE_STAGING;
+        desc.MiscFlags = 0;
+        desc.MipLevels = 1;
+
+        ID3D11Texture2D* stagingTexture;
+        if (device->CreateTexture2D(&desc, null, &stagingTexture) < 0)
+            return null;
+
+        ID3D11DeviceContext* context;
+        device->GetImmediateContext(&context);
+
+        context->CopyResource((ID3D11Resource*)stagingTexture, (ID3D11Resource*)texture);
+
+        D3D11_MAPPED_SUBRESOURCE mapped;
+        if (context->Map((ID3D11Resource*)stagingTexture, 0, D3D11_MAP.D3D11_MAP_READ, 0, &mapped) < 0)
         {
-            ArraySize = 1,
-            BindFlags = BindFlags.None,
-            CpuAccessFlags = CpuAccessFlags.Read,
-            Format = desc.Format,
-            Height = desc.Height,
-            Width = desc.Width,
-            MipLevels = 1,
-            OptionFlags = desc.OptionFlags,
-            SampleDescription = new SampleDescription(1, 0),
-            Usage = ResourceUsage.Staging
+            stagingTexture->Release();
+            return null;
+        }
+
+        var sourcePtr = (nint)mapped.pData;
+        var rowPitch = mapped.RowPitch;
+        var image = new Image<Bgra32>((int)desc.Width, (int)desc.Height);
+
+        image.ProcessPixelRows(accessor =>
+        {
+            for (var y = 0; y < accessor.Height; y++)
+            {
+                var destSpan = accessor.GetRowSpan(y);
+                var src = (byte*)sourcePtr + y * rowPitch;
+                Buffer.MemoryCopy(src, Unsafe.AsPointer(ref destSpan[0]), destSpan.Length * 4, destSpan.Length * 4);
+            }
         });
 
-        device.ImmediateContext.CopyResource(texture, stagingTexture);
+        context->Unmap((ID3D11Resource*)stagingTexture, 0);
+        stagingTexture->Release();
 
-        device.ImmediateContext.MapSubresource(stagingTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out var dataStream);
-
-        using var pixelDataStream = new MemoryStream();
-        dataStream.CopyTo(pixelDataStream);
-
-        device.ImmediateContext.UnmapSubresource(stagingTexture, 0);
-
-        return Image.LoadPixelData<Bgra32>(pixelDataStream.ToArray(), desc.Width, desc.Height);
+        return image;
     }
 
     public Image? GetImage(string path)
