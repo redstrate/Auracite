@@ -4,6 +4,17 @@ using System.Diagnostics.CodeAnalysis;
 namespace Auracite;
 
 [SuppressMessage("ReSharper", "InconsistentNaming")]
+public class AdventurerPlate
+{
+    public string? title;
+    public bool? title_is_prefix;
+    public string? class_job;
+    public int class_job_level;
+    public string? search_comment;
+    public bool invert_portrait_placement;
+}
+
+[SuppressMessage("ReSharper", "InconsistentNaming")]
 public class InventoryItem
 {
     public int slot;
@@ -97,11 +108,7 @@ public class CharacterJson
     public int voice;
 
     // adventurer plate
-    public string? plate_title;
-    public bool? plate_title_is_prefix;
-    public string? plate_class_job;
-    public int plate_class_job_level;
-    public string? search_comment;
+    public AdventurerPlate plate = new AdventurerPlate();
 
     public bool is_battle_mentor;
     public bool is_trade_mentor;

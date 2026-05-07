@@ -107,11 +107,12 @@ public class AdventurerPlateStep : IStep
                     }
                 }
 
-                Plugin.package.plate_title = Title?.Feminine.ToString(); // TODO: Support mascs
-                Plugin.package.plate_title_is_prefix = Title?.IsPrefix;
-                Plugin.package.plate_class_job = ClassJob?.Name.ToString();
-                Plugin.package.plate_class_job_level = AgentCharaCard.Instance()->Data->Level;
-                Plugin.package.search_comment = AgentCharaCard.Instance()->Data->SearchComment.ToString();
+                Plugin.package.plate.title = Title?.Feminine.ToString(); // TODO: Support mascs
+                Plugin.package.plate.title_is_prefix = Title?.IsPrefix;
+                Plugin.package.plate.class_job = ClassJob?.Name.ToString();
+                Plugin.package.plate.class_job_level = AgentCharaCard.Instance()->Data->Level;
+                Plugin.package.plate.search_comment = AgentCharaCard.Instance()->Data->SearchComment.ToString();
+                Plugin.package.plate.invert_portrait_placement = storage->InvertPortraitPlacement;
                 Completed?.Invoke();
             }
         }
