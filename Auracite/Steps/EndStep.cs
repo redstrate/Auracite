@@ -76,7 +76,7 @@ public class EndStep : IStep
     private void StartWebServer()
     {
         _server = new WebServer(o => o
-                .WithUrlPrefix("http://localhost:42073/")
+                .WithUrlPrefix($"http://localhost:{Plugin.Port}/")
                 .WithMode(HttpListenerMode.EmbedIO))
             .WithWebApi("/", m => m.WithController(() => new Controller(this)));
         _server.RunAsync();

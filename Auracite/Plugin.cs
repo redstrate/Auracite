@@ -63,10 +63,12 @@ public sealed class Plugin : IDalamudPlugin
 
     [PluginService] internal static IGameInteropProvider Hooking { get; private set; } = null!;
 
+    /// Port to run the webserver on.
+    public static int Port = 42073;
+
     public void Dispose()
     {
-        CurrentStep?.Dispose();
-        WindowSystem.RemoveAllWindows();
+        Stop();
     }
 
     private void OnAuraciteCommand(string command, string arguments)
@@ -85,11 +87,10 @@ public sealed class Plugin : IDalamudPlugin
         _stepIndex++;
         if (_stepIndex >= _steps.Count)
         {
-            CurrentStep?.Dispose();
-            CurrentStep = null;
-            StepWindow.IsOpen = false;
+            Stop();
             return;
         }
+        CurrentStep?.Dispose();
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
         CurrentStep.Run();
@@ -99,6 +100,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         CurrentStep?.Dispose();
         CurrentStep = null;
-        StepWindow.IsOpen = false;
+        WindowSystem.RemoveAllWindows();
     }
 }
