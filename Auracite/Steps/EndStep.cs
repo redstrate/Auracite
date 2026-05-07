@@ -45,8 +45,9 @@ public class EndStep : IStep
         [Route(HttpVerbs.Get, "/download")]
         public void GetPackage()
         {
-            Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin, "*");
             Response.ContentType = "application/zip";
+            Response.Headers.Add("Content-Disposition", $"attachment; filename=\"{Plugin.package.name}\"");
+
             using var writer = HttpContext.OpenResponseStream(true);
 
             using (var archive = new ZipArchive(writer, ZipArchiveMode.Create, true))
