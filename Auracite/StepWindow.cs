@@ -1,11 +1,10 @@
-using System;
 using Dalamud.Interface.Windowing;
 using Dalamud.Bindings.ImGui;
 using System.Diagnostics;
 
 namespace Auracite;
 
-public class StepWindow : Window, IDisposable
+public class StepWindow : Window
 {
     private Plugin plugin;
 
@@ -13,11 +12,6 @@ public class StepWindow : Window, IDisposable
     {
         this.plugin = plugin;
         this.ShowCloseButton = false;
-    }
-
-    public void Dispose()
-    {
-
     }
 
     public override void Draw()

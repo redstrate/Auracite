@@ -13,11 +13,6 @@ namespace Auracite;
 
 public class AdventurerPlateStep : IStep
 {
-    public AdventurerPlateStep()
-    {
-
-    }
-
     public void Dispose()
     {
 

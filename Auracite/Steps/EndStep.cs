@@ -75,8 +75,6 @@ public class EndStep : IStep
 
     private void StartWebServer()
     {
-        ShutdownWebServer();
-
         _server = new WebServer(o => o
                 .WithUrlPrefix("http://localhost:42073/")
                 .WithMode(HttpListenerMode.EmbedIO))
@@ -84,15 +82,10 @@ public class EndStep : IStep
         _server.RunAsync();
     }
 
-    private void ShutdownWebServer()
+    public void Dispose()
     {
         _server?.Dispose();
         _server = null;
-    }
-
-    public void Dispose()
-    {
-        ShutdownWebServer();
     }
 
     public bool IsEnd()

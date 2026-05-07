@@ -7,10 +7,6 @@ namespace Auracite;
 
 public class TitleStep : IStep
 {
-    public TitleStep()
-    {
-    }
-
     public void Dispose()
     {
     }
