@@ -12,7 +12,7 @@ namespace Auracite;
 public class EndStep : IStep
 {
     public event IStep.CompletedDelegate? Completed;
-    
+
     public void Run()
     {
         StartWebServer();
@@ -32,7 +32,7 @@ public class EndStep : IStep
     {
         return "Save your archived character ZIP.";
     }
-    
+
     private class Controller : WebApiController
     {
         private EndStep _endStep;
@@ -41,11 +41,11 @@ public class EndStep : IStep
         {
             _endStep = endStep;
         }
-        
+
         [Route(HttpVerbs.Get, "/download")]
         public void GetPackage()
         {
-            Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin,  "*");
+            Response.Headers.Set(HttpHeaderNames.AccessControlAllowOrigin, "*");
             Response.ContentType = "application/zip";
             using var writer = HttpContext.OpenResponseStream(true);
 
@@ -70,9 +70,9 @@ public class EndStep : IStep
             }
         }
     }
-    
+
     private WebServer? _server;
-    
+
     private void StartWebServer()
     {
         ShutdownWebServer();

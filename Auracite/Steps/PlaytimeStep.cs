@@ -31,7 +31,7 @@ public class PlaytimeStep : IStep
     {
         return "Type /playtime into the chat window.";
     }
-    
+
     // Verbatim prefixes from LogMessage row 859 in the four supported client
     // languages. Any whitespace or colon between the prefix and the value is
     // stripped at extraction time so the same code path handles all four.

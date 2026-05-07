@@ -40,13 +40,17 @@ public class InventoryStep : IStep
         Completed?.Invoke();
     }
 
-    private unsafe Auracite.InventoryContainer ProcessContainer(FFXIVClientStructs.FFXIV.Client.Game.InventoryContainer *container) {
+    private unsafe Auracite.InventoryContainer ProcessContainer(FFXIVClientStructs.FFXIV.Client.Game.InventoryContainer* container)
+    {
         var serializedContainer = new Auracite.InventoryContainer();
 
-        for (int i = 0; i < container->Size; i++) {
+        for (int i = 0; i < container->Size; i++)
+        {
             var item = container->GetInventorySlot(i);
-            if (item != null) {
-                if (item->GetQuantity() == 0) {
+            if (item != null)
+            {
+                if (item->GetQuantity() == 0)
+                {
                     continue;
                 }
 

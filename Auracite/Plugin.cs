@@ -54,11 +54,11 @@ public sealed class Plugin : IDalamudPlugin
 
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
 
-    [PluginService] internal static ICommandManager CommandManager { get; private set;  } = null!;
-    
-    [PluginService] internal static IDataManager DataManager { get; private set;  } = null!;
+    [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
 
-    [PluginService] internal static IFramework Framework { get; private set;  } = null!;
+    [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
+
+    [PluginService] internal static IFramework Framework { get; private set; } = null!;
 
     public void Dispose()
     {
@@ -79,7 +79,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void NextStep()
     {
-        _stepIndex++; 
+        _stepIndex++;
         if (_stepIndex >= _steps.Count)
         {
             CurrentStep?.Dispose();
@@ -101,7 +101,8 @@ public sealed class Plugin : IDalamudPlugin
 
     private void CheckCurrentStep(IFramework framework)
     {
-        if (CurrentStep != null && CurrentStep.NeedsUpdateEveryFrame()) {
+        if (CurrentStep != null && CurrentStep.NeedsUpdateEveryFrame())
+        {
             CurrentStep.Run();
         }
     }

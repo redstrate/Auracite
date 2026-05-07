@@ -16,12 +16,12 @@ public class AdventurerPlateStep : IStep
 {
     public AdventurerPlateStep()
     {
-        
+
     }
 
     public void Dispose()
     {
-        
+
     }
 
     public event IStep.CompletedDelegate? Completed;
@@ -38,7 +38,7 @@ public class AdventurerPlateStep : IStep
                 if (image == null) return; // texture not ready yet, retry next frame
 
                 var plateDesign = storage->PlateDesign;
-                
+
                 if (plateDesign.BasePlate != 0)
                 {
                     Plugin.base_plate = GetImage(ResolveCardBase(plateDesign.BasePlate));
@@ -54,36 +54,37 @@ public class AdventurerPlateStep : IStep
                     }
 
                     var path = ResolveCardDecoration(rowIndex);
-                    if (path == null) {
+                    if (path == null)
+                    {
                         continue;
                     }
-                    
+
                     switch (decoration.Type)
                     {
                         case AgentCharaCard.DecorationType.PatternOverlay:
-                        {
-                            Plugin.pattern_overlay = GetImage(path);
-                        }
+                            {
+                                Plugin.pattern_overlay = GetImage(path);
+                            }
                             break;
                         case AgentCharaCard.DecorationType.Backing:
-                        {
-                            Plugin.backing = GetImage(path);
-                        }
+                            {
+                                Plugin.backing = GetImage(path);
+                            }
                             break;
                         case AgentCharaCard.DecorationType.PortraitFrame:
-                        {
-                            Plugin.portrait_frame = GetImage(path);
-                        }
+                            {
+                                Plugin.portrait_frame = GetImage(path);
+                            }
                             break;
                         case AgentCharaCard.DecorationType.PlateFrame:
-                        {
-                            Plugin.plate_frame = GetImage(path);
-                        }
+                            {
+                                Plugin.plate_frame = GetImage(path);
+                            }
                             break;
                         case AgentCharaCard.DecorationType.Accent:
-                        {
-                            Plugin.accent = GetImage(path);
-                        }
+                            {
+                                Plugin.accent = GetImage(path);
+                            }
                             break;
                     }
                 }
@@ -91,7 +92,8 @@ public class AdventurerPlateStep : IStep
                 if (plateDesign.TopBorder != 0)
                 {
                     var path = ResolveCardHeaderTop(plateDesign.TopBorder);
-                    if (path != null) {
+                    if (path != null)
+                    {
                         Plugin.top_border = GetImage(path);
                     }
                 }
@@ -99,7 +101,8 @@ public class AdventurerPlateStep : IStep
                 if (plateDesign.BottomBorder != 0)
                 {
                     var path = ResolveCardHeaderBottom(plateDesign.BottomBorder);
-                    if (path != null) {
+                    if (path != null)
+                    {
                         Plugin.bottom_border = GetImage(path);
                     }
                 }
@@ -113,7 +116,7 @@ public class AdventurerPlateStep : IStep
             }
         }
     }
-    
+
     public unsafe Image? GetCurrentCharaViewImage()
     {
         var data = AgentCharaCard.Instance()->Data;
@@ -125,10 +128,10 @@ public class AdventurerPlateStep : IStep
 
         var texture = CppObject.FromPointer<Texture2D>((nint)d3d11Texture);
         var device = (Device5)(IntPtr)FFXIVClientStructs.FFXIV.Client.Graphics.Kernel.Device.Instance()->D3D11Forwarder;
-        
+
         // Copy to a CPU-mapped staging texture 
         var desc = texture.Description;
-        
+
         using var stagingTexture = new Texture2D(device, new Texture2DDescription()
         {
             ArraySize = 1,
@@ -151,32 +154,37 @@ public class AdventurerPlateStep : IStep
         dataStream.CopyTo(pixelDataStream);
 
         device.ImmediateContext.UnmapSubresource(stagingTexture, 0);
-        
+
         return Image.LoadPixelData<Bgra32>(pixelDataStream.ToArray(), desc.Width, desc.Height);
     }
 
     public Image? GetImage(string path)
     {
         var tex = Plugin.DataManager.GetFile<TexFile>(path);
-        if (tex == null) {
+        if (tex == null)
+        {
             return null;
         }
         tex.LoadFile();
         var imageData = tex.GetRgbaImageData();
         return Image.LoadPixelData<Rgba32>(imageData, tex.Header.Width, tex.Header.Height);
     }
-    
-    private unsafe Title? Title {
-        get {
+
+    private unsafe Title? Title
+    {
+        get
+        {
             ushort titleId = AgentCharaCard.Instance()->Data->TitleId;
             return titleId == 0
                 ? null
                 : Plugin.DataManager.GetExcelSheet<Title>()?.GetRow(titleId);
         }
     }
-    
-    private unsafe ClassJob? ClassJob {
-        get {
+
+    private unsafe ClassJob? ClassJob
+    {
+        get
+        {
             ushort classJobId = AgentCharaCard.Instance()->Data->ClassJobId;
             return classJobId == 0
                 ? null
@@ -204,19 +212,19 @@ public class AdventurerPlateStep : IStep
         var row = Plugin.DataManager.GetExcelSheet<CharaCardBase>()?.GetRow(rowIndex);
         return $"ui/icon/{row?.Image.ToString().Substring(0, 3)}000/{row?.Image}_hr1.tex";
     }
-    
+
     public string? ResolveCardDecoration(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardDecoration>()?.GetRow(rowIndex);
         return $"ui/icon/{row?.Image.ToString().Substring(0, 3)}000/{row?.Image}_hr1.tex";
     }
-    
+
     public string? ResolveCardHeaderTop(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardHeader>()?.GetRow(rowIndex);
         return $"ui/icon/{row?.TopImage.ToString().Substring(0, 3)}000/{row?.TopImage}_hr1.tex";
     }
-    
+
     public string? ResolveCardHeaderBottom(uint rowIndex)
     {
         var row = Plugin.DataManager.GetExcelSheet<CharaCardHeader>()?.GetRow(rowIndex);

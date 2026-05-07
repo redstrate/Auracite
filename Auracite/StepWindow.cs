@@ -24,7 +24,8 @@ public class StepWindow : Window, IDisposable
     {
         if (Plugin.CurrentStep != null)
         {
-            if (Plugin.CurrentStep.IsEnd()) {
+            if (Plugin.CurrentStep.IsEnd())
+            {
                 ImGui.Text("Archive created! Please download it below and keep it in a safe place.");
                 ImGui.Text("The plugin can be disabled once you're done using it.");
 
@@ -37,7 +38,9 @@ public class StepWindow : Window, IDisposable
                 {
                     plugin.Stop();
                 }
-            } else {
+            }
+            else
+            {
                 ImGui.Text($"Step: {Plugin.CurrentStep.StepName()}");
                 ImGui.Separator();
                 ImGui.Text(Plugin.CurrentStep.StepDescription());

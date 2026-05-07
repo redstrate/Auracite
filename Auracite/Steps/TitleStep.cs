@@ -19,7 +19,8 @@ public class TitleStep : IStep
 
     public void Run()
     {
-        unsafe {
+        unsafe
+        {
             var uiState = UIState.Instance();
             var playerState = PlayerState.Instance();
             if (uiState->TitleList.DataReceived)

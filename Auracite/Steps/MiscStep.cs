@@ -28,10 +28,13 @@ public class MiscStep : IStep
             Plugin.package!.tribe = IStep.SaveNameValue<Tribe>(playerState->Tribe, tribe => playerState->Sex == 1 ? tribe.Feminine : tribe.Masculine);
             Plugin.package!.race = IStep.SaveNameValue<Race>(playerState->Race, race => playerState->Sex == 1 ? race.Feminine : race.Masculine);
             var classJobSheet = Plugin.DataManager.GetExcelSheet<ClassJob>()!;
-            for (int i = 0; i < playerState->ClassJobLevels.Length; i++) {
+            for (int i = 0; i < playerState->ClassJobLevels.Length; i++)
+            {
                 var classLevel = new ClassJobLevel();
-                foreach (var row in classJobSheet) {
-                    if (row.ExpArrayIndex == i) {
+                foreach (var row in classJobSheet)
+                {
+                    if (row.ExpArrayIndex == i)
+                    {
                         classLevel.name = row.NameEnglish.ToString()!;
                         classLevel.value = row.RowId;
                         break;
@@ -41,7 +44,8 @@ public class MiscStep : IStep
                 classLevel.exp = playerState->ClassJobExperience[i];
 
                 // Exclude currently unavailable jobs
-                if (classLevel.name != null) {
+                if (classLevel.name != null)
+                {
                     Plugin.package!.classjob_levels.Add(classLevel);
                 }
             }
