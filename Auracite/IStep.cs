@@ -18,6 +18,10 @@ public interface IStep : IDisposable
     {
         return false;
     }
+    bool RequiresManualConfirmation()
+    {
+        return false;
+    }
 
     delegate void CompletedDelegate();
 

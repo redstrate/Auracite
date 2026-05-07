@@ -38,4 +38,9 @@ public class TitleStep : IStep
     {
         return "Open the title list.";
     }
+
+    bool RequiresManualConfirmation()
+    {
+        return true;
+    }
 }

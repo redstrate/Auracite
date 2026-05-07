@@ -39,11 +39,18 @@ public class StepWindow : Window
                 ImGui.Separator();
                 ImGui.TextWrapped(Plugin.CurrentStep.StepDescription());
 
-                ImGui.TextDisabled("This step requires manual user action.");
-
-                if (ImGui.Button("Try Again"))
+                if (Plugin.CurrentStep.RequiresManualConfirmation())
                 {
-                    Plugin.CurrentStep.Run();
+                    ImGui.TextDisabled("This step requires manual user action.");
+
+                    if (ImGui.Button("Try Again"))
+                    {
+                        Plugin.CurrentStep.Run();
+                    }
+                }
+                else
+                {
+                    ImGui.TextDisabled("This step is currently waiting to complete.");
                 }
             }
         }

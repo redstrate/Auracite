@@ -93,7 +93,13 @@ public sealed class Plugin : IDalamudPlugin
         CurrentStep?.Dispose();
         CurrentStep = (IStep)Activator.CreateInstance(_steps[_stepIndex])!;
         CurrentStep.Completed += NextStep;
-        CurrentStep.Run();
+
+        // Delay running the step as to not lock up any one thread in one run
+        Framework.RunOnTick(
+            () =>
+            {
+                CurrentStep.Run();
+            }, delay: TimeSpan.FromSeconds(1));
     }
 
     public void Stop()
