@@ -68,6 +68,7 @@ public class EndStep : IStep
                 WriteImage(archive, Plugin.portrait, "plate-portrait.png");
                 WriteImage(archive, Plugin.top_border, "top-border.png");
                 WriteImage(archive, Plugin.bottom_border, "bottom-border.png");
+                WriteImage(archive, Plugin.portrait_frame, "portrait-frame.png");
             }
         }
     }
