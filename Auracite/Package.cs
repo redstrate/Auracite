@@ -135,6 +135,7 @@ public class CharacterJson
     public InventoryContainer? armory_hands;
     public InventoryContainer? armory_waist;
     public InventoryContainer? armory_legs;
+    public InventoryContainer? armory_feets;
     public InventoryContainer? armory_ear;
     public InventoryContainer? armory_neck;
     public InventoryContainer? armory_wrist;
