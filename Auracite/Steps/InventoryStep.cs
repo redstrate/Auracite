@@ -29,6 +29,7 @@ public class InventoryStep : IStep
                 Plugin.package.armory_hands = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryHands));
                 Plugin.package.armory_waist = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryWaist));
                 Plugin.package.armory_legs = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryLegs));
+                Plugin.package.armory_feets = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryFeets));
                 Plugin.package.armory_ear = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryEar));
                 Plugin.package.armory_neck = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryNeck));
                 Plugin.package.armory_wrist = ProcessContainer(manager->GetInventoryContainer(InventoryType.ArmoryWrist));
